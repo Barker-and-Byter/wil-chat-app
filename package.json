@@ -16,7 +16,8 @@
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
 		"db:studio": "drizzle-kit studio",
-		"auth:schema": "auth generate --config src/lib/server/auth.ts --output src/lib/server/db/auth.schema.ts --yes"
+		"auth:schema": "auth generate --config src/lib/server/auth.ts --output src/lib/server/db/auth.schema.ts --yes",
+		"RT:testMessage": "pnpm exec node --experimental-strip-types scripts/testGetMessage.ts"
 	},
 	"devDependencies": {
 		"@sveltejs/adapter-auto": "^7.0.1",
@@ -28,8 +29,6 @@
 		"@types/node": "^24",
 		"auth": "^1.6.23",
 		"better-auth": "^1.6.23",
-		"drizzle-kit": "^0.31.10",
-		"drizzle-orm": "^0.45.2",
 		"prettier": "^3.8.3",
 		"prettier-plugin-svelte": "^4.1.0",
 		"prettier-plugin-tailwindcss": "^0.8.0",
@@ -40,6 +39,6 @@
 		"vite": "^8.0.16"
 	},
 	"dependencies": {
-		"better-sqlite3": "^13.0.2"
+		"arktype": "^2.2.3"
 	}
 }
