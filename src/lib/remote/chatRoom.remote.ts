@@ -15,6 +15,8 @@ export const getChat = query.live(chatArgs, async function* ({ room, id, usernam
 
     const isNew = await chatRoom.join(id)
 
+    await userList.addUser(id, username);
+
     if (isNew) {
         await chatRoom.addMessage({
             id: crypto.randomUUID(),
@@ -66,13 +68,14 @@ export const getChat = query.live(chatArgs, async function* ({ room, id, usernam
 })
 
 export const addMessage = command(messageArgs, async ({ room, userId, text }) => {
-    const username = await getUserList().getUsername(userId)
+    const chatRoom = getRoom(room);
+    const username = await getUserList().getUserName(userId);
 
     if (!username) {
         error(400, 'You need to join before sending messages')
     }
 
-    await getRoom(room).addMessage({ id: crypto.randomUUID(), username, text })
+    await chatRoom.addMessage({ id: crypto.randomUUID(), username: username, text: text})
 })
 
 export const deleteMessage = command(deleteArgs, async ({ room, id }) => {

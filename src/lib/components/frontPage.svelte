@@ -10,26 +10,29 @@
 	import MessageHeader from './ui/message/message-header.svelte';
 	import Bubble from './ui/bubble/bubble.svelte';
 	import BubbleContent from './ui/bubble/bubble-content.svelte';
+    import { Marker, MarkerContent, MarkerIcon } from '$lib/components/ui/marker';
+
 
     import { getChat, addMessage, deleteMessage } from '$lib/remote/chatRoom.remote';
     import { addUser } from '$lib/remote/users.remote';
 	import { onMount, tick } from 'svelte';
+	import { createRoom } from '$lib/remote/roomList.remote';
 
     let inputField = $state("");
     let chatHistory: HTMLDivElement | null = $state(null);
 
-    const id = crypto.randomUUID();
-    addUser({id: id, username: "jared"});
-    const loadChat = getChat({room: "global", id: id, username: "jared"});
-    let messages = $derived(loadChat.current?.messages);
-    let users = $derived(loadChat.current?.users);
+    let id = $state("");
+    let loadChat = $state<any>(null);
+
+    let messages = $derived(loadChat?.current?.messages ?? []);
+    let users = $derived(loadChat?.current?.users ?? []);
 
 
     async function submit(event: KeyboardEvent){
         if (event.key === 'Enter' && inputField.trim() !== ''){
             event.preventDefault();
 
-            addMessage({room: "global", userId: id, text: inputField.trim()})
+            await addMessage({room: "global", userId: id, text: inputField.trim()})
 
             inputField = '';
             await tick();
@@ -39,6 +42,11 @@
         }
     }
 
+    onMount(() => {
+        id = crypto.randomUUID();
+        createRoom({name: "global"});
+        loadChat = getChat({room: "global", id: id, username: "jared"})
+    })
 </script>
 
 <h1>hello</h1>
@@ -54,6 +62,7 @@
             class="h-full overflow-y"
 		>
         {#each messages as msg}
+            {#if (!msg.system)}
             <Message align="end" class="pt-3">
                 <MessageHeader>{msg.username}</MessageHeader>
                 <MessageContent>
@@ -62,7 +71,13 @@
                     </Bubble>
                 </MessageContent>
             </Message>
+            {:else}
+            <Marker variant='separator'>
+                <MarkerContent>{msg.text}</MarkerContent>
+            </Marker>
+            {/if}
         {/each}
+
 		</div>
 	</ScrollArea>
 	<div class="grid w-1/3 grid-cols-[1fr_auto] items-center gap-2">
