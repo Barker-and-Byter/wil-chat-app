@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 import { error } from '@sveltejs/kit';
 import { command } from '$app/server';
-import { getUserList } from './getSimple.remote';
+import { getUserList } from '../getSimple';
 import type { User } from '$lib/types/types';
 
 const userArgs = type({ id: 'string', username: 'string' })

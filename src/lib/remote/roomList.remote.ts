@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 import { error } from '@sveltejs/kit';
 import { query, command } from '$app/server';
-import { getRoomList } from './getSimple.remote';
+import { getRoomList } from '../getSimple';
 import type { Room } from '$lib/types/types';
 
 const createRoomArgs = type({ name: 'string' })
