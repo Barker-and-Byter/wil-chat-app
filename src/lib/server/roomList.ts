@@ -1,9 +1,9 @@
 import { error } from '@sveltejs/kit';
 import { DurableObject } from 'cloudflare:workers';
-import type { Room } from '$lib/types/types';
+import type { RoomType } from '$lib/types/types';
 
 export class RoomList extends DurableObject {
-    rooms: Room[] = []
+    rooms: RoomType[] = []
 //   version = 0
     isChanged = false
 

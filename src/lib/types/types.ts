@@ -1,5 +1,6 @@
-export type Message = { id: string, username: string, text: string, system?: boolean }
+export type MessageType = { id: string, username: string, text: string, system?: boolean }
 
-export type User = { id: string, username: string, lastSeen: number, typing: boolean }
+export type UserType = { id: string, username: string, lastSeen: number, typing: boolean }
 
-export type Room = { name: string; createdAt: number }
+export type RoomType = { name: string; createdAt: number }
+

@@ -13,51 +13,18 @@
 	import { onMount, tick } from 'svelte';
     import { addUser, setTyping } from '$lib/remote/users.remote';
     import { getChat, addMessage } from '$lib/remote/chatRoom.remote';
-    import type { MessageType, UserType } from '$lib/types/types'
 
-    let inputField = $state("");
-    let chatHistory: HTMLDivElement | null = $state(null);
-    let messages = $state([{sender: "Marissa", text: "hello everybody my name is markiplier..."}]);
 
     
 
-    async function submit(event: KeyboardEvent){
-        if (event.key === 'Enter' && inputField.trim() !== ''){
-            event.preventDefault();
-
-            messages = [...messages,{
-                sender: "Marrisa",
-                text: inputField.trim()
-            }];
-
-            inputField = '';
-            await tick();
-            if (chatHistory) {
-                chatHistory.scrollTop = chatHistory.scrollHeight;
-            }
-        }
-    }
-
     const myId = crypto.randomUUID()
 
-    let username = $state('');
-    let joined = $state(false);
     let text = $state('');
-    // let chat = $state({ messages: [] as MessageType[], users: [] as UserType[] })
 
-    await addUser({ id: myId, username: "pall"})
+    let chat = $state<any>()
 
-    const chat = getChat({ room: "main", id: myId, username: "pall" })
+    // const chat = getChat({ room: "main", id: myId, username: "pall" })
 
-    // async function join() {
-    //     try {
-    //         await addUser({ id: myId, username });
-    //         chat = getChat({ room: "main", id: myId, username });
-    //         joined = true;
-    //     } catch (err) {
-    //         alert( 'Could not join');
-    //     }
-    // }
 
     async function send() {
         await addMessage({ room: "main", userId: myId, text });
@@ -68,6 +35,7 @@
 <!-- <h1>hello</h1>
 <Button>Click me!</Button> -->
 <main class="flex min-h-screen flex-col items-center gap-4 p-10">
+    {#if chat?.current}
 
     <!-- {#if !joined}
         <input bind:value={username} placeholder="pick a name" />
@@ -107,10 +75,10 @@
 	
     <ScrollArea class="h-150 w-full rounded-md border p-4">
         <div
-            bind:this={chatHistory}
+
             class="h-full overflow-y"
         >
-        {#each messages as msg}
+        <!-- {#each messages as msg}
             <Message align="end" class="pt-3">
                 <MessageHeader>{msg.sender}</MessageHeader>
                 <MessageContent>
@@ -119,7 +87,7 @@
                     </Bubble>
                 </MessageContent>
             </Message>
-        {/each}
+        {/each} -->
         </div>
     </ScrollArea>
 
@@ -128,4 +96,5 @@
 		<Input placeholder="Message..." type="text" bind:value={inputField} onkeydown={submit} class="max-w-300" />
 		<SendButton onkeydown />
 	</div> -->
+    {/if}
 </main>

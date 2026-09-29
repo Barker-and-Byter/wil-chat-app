@@ -2,7 +2,7 @@ import { type } from 'arktype';
 import { error } from '@sveltejs/kit';
 import { query, command } from '$app/server';
 import { getRoomList } from '../getSimple';
-import type { Room } from '$lib/types/types';
+import type { RoomType } from '$lib/types/types';
 
 const createRoomArgs = type({ name: 'string' })
 
@@ -16,7 +16,7 @@ export const createRoom = command(createRoomArgs, async ({ name }) => {
   const { rooms } = await roomList.getRooms()
 
   // Type define r
-  const taken = rooms.some((r: Room) => r.name === name)
+  const taken = rooms.some((r: RoomType) => r.name === name)
 
   if (taken) {
     error(409, 'Room already exists')

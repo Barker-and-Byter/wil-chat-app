@@ -1,10 +1,10 @@
 import { error } from '@sveltejs/kit';
 import { DurableObject } from 'cloudflare:workers';
-import type { User } from '$lib/types/types';
+import type { UserType } from '$lib/types/types';
 
 
 export class UserList extends DurableObject {
-    users: User[] = []
+    users: UserType[] = []
     // version = 0
     isChanged = false
 
@@ -28,7 +28,7 @@ export class UserList extends DurableObject {
         }
     }
 
-    getUserName(id: string) {
+    getUsername(id: string) {
         const user = this.users.find((u) => u.id === id)
         return user?.username
     }

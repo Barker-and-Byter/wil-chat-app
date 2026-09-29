@@ -1,9 +1,9 @@
-import type { Message } from '$lib/types/types';
+import type { MessageType } from '$lib/types/types';
 import { DurableObject } from 'cloudflare:workers';
 
 
 export class ChatRoom extends DurableObject {
-  messages: Message[] = []
+  messages: MessageType[] = []
   maxMessages = 200
   // version = 0
   isChanged = false
@@ -23,7 +23,8 @@ export class ChatRoom extends DurableObject {
     this.usersPresent.delete(id)
   }
 
-  addMessage(message: Message) {
+  addMessage(message: MessageType) {
+    console.log(message)
     this.messages.push(message)
     if (this.messages.length > this.maxMessages) {
         this.messages.shift()

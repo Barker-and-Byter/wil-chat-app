@@ -2,7 +2,7 @@ import { type } from 'arktype';
 import { error } from '@sveltejs/kit';
 import { query, command } from '$app/server';
 import { getRoom, getUserList } from '../getSimple';
-import type { Message, User } from '$lib/types/types';
+import type { MessageType, UserType } from '$lib/types/types';
 
 const chatArgs = type({ room: 'string', id: 'string', username: 'string' });
 const messageArgs = type({ room: 'string', userId: 'string', text: 'string' });
@@ -13,7 +13,11 @@ export const getChat = query.live(chatArgs, async function* ({ room, id, usernam
     const chatRoom = getRoom(room)
     const userList = getUserList()
 
+    userList.addUser(id, username)
+
     const isNew = await chatRoom.join(id)
+
+
 
     if (isNew) {
         await chatRoom.addMessage({
@@ -26,7 +30,7 @@ export const getChat = query.live(chatArgs, async function* ({ room, id, usernam
 
     //   let lastMessageVersion = -1
     //   let lastUserVersion = -1
-    let last = { messages: [] as Message[], users: [] as User[] }
+    let last = { messages: [] as MessageType[], users: [] as UserType[] }
 
     try {
         while (true) {
@@ -44,7 +48,7 @@ export const getChat = query.live(chatArgs, async function* ({ room, id, usernam
 
 
             if (msgState.isChanged || userState.isChanged) {
-                last = { messages: msgState.message, users: {id, ...userState.users} }
+                last = { messages: msgState.message, users: userState.users }
                 chatRoom.acknowledgeChange()
                 userList.acknowledgeChange()
                 yield last
@@ -66,13 +70,18 @@ export const getChat = query.live(chatArgs, async function* ({ room, id, usernam
 })
 
 export const addMessage = command(messageArgs, async ({ room, userId, text }) => {
+
+    console.log("ran", text + userId)
     const username = await getUserList().getUsername(userId)
 
+    console.log(username)
     if (!username) {
         error(400, 'You need to join before sending messages')
     }
 
     await getRoom(room).addMessage({ id: crypto.randomUUID(), username, text })
+
+    console.log("Did")
 })
 
 export const deleteMessage = command(deleteArgs, async ({ room, id }) => {
