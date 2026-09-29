@@ -1,8 +1,6 @@
 import { getRequestEvent } from '$app/server';
 import { error } from '@sveltejs/kit';
 
-
-// TODO: figure out platform
 export function getRoom(roomName: string) {
     const { platform } = getRequestEvent()
     if (!platform) error(500, 'Get Room Name failed')
