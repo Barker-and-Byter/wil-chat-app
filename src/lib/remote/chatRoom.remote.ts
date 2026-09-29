@@ -8,6 +8,7 @@ const chatArgs = type({ room: 'string', id: 'string', username: 'string' });
 const messageArgs = type({ room: 'string', userId: 'string', text: 'string' });
 const deleteArgs = type({ room: 'string', id: 'string' });
 
+
 export const getChat = query.live(chatArgs, async function* ({ room, id, username }) {
 	const chatRoom = getRoom(room);
 	const userList = getUserList();

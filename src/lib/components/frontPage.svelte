@@ -33,7 +33,7 @@
         username = submittedUsername;
         isLoggedIn = true;
 
-		loadChat = getChat({ room: 'global', id: id, username: username });
+		loadChat = await getChat({ room: 'global', id: id, username: username });
     }
 
     async function handleSend() {

@@ -34,7 +34,7 @@
 			<FieldGroup>
 				<Field>
 					<FieldLabel for="username-{id}">Username</FieldLabel>
-					<Input id="username-{id}" placeholder="Username" required bind:value={username} />
+					<Input id="username-{id}" placeholder="Username" required bind:value={username} maxlength="20" minlength="3"/>
 				</Field>
 				<Field>
 					<Button type="submit" class="w-full">Login</Button>
