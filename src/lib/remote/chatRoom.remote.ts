@@ -1,7 +1,7 @@
 import { type } from 'arktype';
 import { error } from '@sveltejs/kit';
 import { query, command } from '$app/server';
-import { getRoom, getUserList } from './getSimple.remote';
+import { getRoom, getUserList } from '../getSimple';
 import type { Message, User } from '$lib/types/types';
 
 const chatArgs = type({ room: 'string', id: 'string', username: 'string' });
