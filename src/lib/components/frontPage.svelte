@@ -10,43 +10,43 @@
 	import MessageHeader from './ui/message/message-header.svelte';
 	import Bubble from './ui/bubble/bubble.svelte';
 	import BubbleContent from './ui/bubble/bubble-content.svelte';
-    import { Marker, MarkerContent, MarkerIcon } from '$lib/components/ui/marker';
+	import { Marker, MarkerContent, MarkerIcon } from '$lib/components/ui/marker';
 
-
-    import { getChat, addMessage, deleteMessage } from '$lib/remote/chatRoom.remote';
-    import { addUser } from '$lib/remote/users.remote';
+	import { getChat, addMessage, deleteMessage } from '$lib/remote/chatRoom.remote';
+	import { addUser } from '$lib/remote/users.remote';
 	import { onMount, tick } from 'svelte';
 	import { createRoom } from '$lib/remote/roomList.remote';
 
-    let inputField = $state("");
-    let chatHistory: HTMLDivElement | null = $state(null);
+	let inputField = $state('');
+	let chatHistory: HTMLDivElement | null = $state(null);
 
-    let id = $state("");
-    let loadChat = $state<any>(null);
+	let id = $state('');
+	let username = $state('');
+	let loadChat = $state<any>(null);
 
-    let messages = $derived(loadChat?.current?.messages ?? []);
-    let users = $derived(loadChat?.current?.users ?? []);
+	let messages = $derived(loadChat?.current?.messages ?? []);
+	let users = $derived(loadChat?.current?.users ?? []);
 
+	async function submit(event: KeyboardEvent) {
+		if (event.key === 'Enter' && inputField.trim() !== '') {
+			event.preventDefault();
 
-    async function submit(event: KeyboardEvent){
-        if (event.key === 'Enter' && inputField.trim() !== ''){
-            event.preventDefault();
+			await addMessage({ room: 'global', userId: id, text: inputField.trim() });
 
-            await addMessage({room: "global", userId: id, text: inputField.trim()})
+			inputField = '';
+			await tick();
+			if (chatHistory) {
+				chatHistory.scrollTop = chatHistory.scrollHeight;
+			}
+		}
+	}
 
-            inputField = '';
-            await tick();
-            if (chatHistory) {
-                chatHistory.scrollTop = chatHistory.scrollHeight;
-            }
-        }
-    }
-
-    onMount(() => {
-        id = crypto.randomUUID();
-        createRoom({name: "global"});
-        loadChat = getChat({room: "global", id: id, username: "jared"})
-    })
+	onMount(() => {
+		id = crypto.randomUUID();
+		createRoom({ name: 'global' });
+		const username = 'jared';
+		loadChat = getChat({ room: 'global', id: id, username: username });
+	});
 </script>
 
 <h1>hello</h1>
@@ -57,31 +57,37 @@
 	</div>
 	<h1 class="pb-20 text-9xl font-black">Chatty App</h1>
 	<ScrollArea class="h-200 w-1/3 rounded-md border p-4">
-		<div
-            bind:this={chatHistory}
-            class="h-full overflow-y"
-		>
-        {#each messages as msg}
-            {#if (!msg.system)}
-            <Message align="end" class="pt-3">
-                <MessageHeader>{msg.username}</MessageHeader>
-                <MessageContent>
-                    <Bubble>
-                        <BubbleContent>{msg.text}</BubbleContent>
-                    </Bubble>
-                </MessageContent>
-            </Message>
-            {:else}
-            <Marker variant='separator'>
-                <MarkerContent>{msg.text}</MarkerContent>
-            </Marker>
-            {/if}
-        {/each}
-
+		<div bind:this={chatHistory} class="overflow-y h-full">
+			{#each messages as msg}
+				{#if !msg.system}
+					<Message
+						align={msg.username === username ? 'end' : 'start'}
+						// aligns at the end when its you aligns at start when it isnt...
+						class="pt-3"
+					>
+						<MessageHeader>{msg.username}</MessageHeader>
+						<MessageContent>
+							<Bubble>
+								<BubbleContent>{msg.text}</BubbleContent>
+							</Bubble>
+						</MessageContent>
+					</Message>
+				{:else}
+					<Marker variant="separator" class="pt-3">
+						<MarkerContent>{msg.text}</MarkerContent>
+					</Marker>
+				{/if}
+			{/each}
 		</div>
 	</ScrollArea>
 	<div class="grid w-1/3 grid-cols-[1fr_auto] items-center gap-2">
-		<Input placeholder="Message..." type="text" bind:value={inputField} onkeydown={submit} class="max-w-300" />
+		<Input
+			placeholder="Message..."
+			type="text"
+			bind:value={inputField}
+			onkeydown={submit}
+			class="max-w-300"
+		/>
 		<SendButton />
 	</div>
 </div>

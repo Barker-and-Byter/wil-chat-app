@@ -18,7 +18,7 @@ export default defineConfig({
 				}
 			},
 			experimental: {
-				remoteFunctions: true,
+				remoteFunctions: true
 			},
 
 			// adapter-auto only supports some environments, see https://svelte.dev/docs/kit/adapter-auto for a list.
@@ -37,7 +37,11 @@ export default defineConfig({
 		// })
 
 		cloudflareDoExporter({
-			durableObjects: ['src/lib/server/ChatRoom.ts', 'src/lib/server/UserList.ts', 'src/lib/server/RoomList.ts'],
+			durableObjects: [
+				'src/lib/server/ChatRoom.ts',
+				'src/lib/server/UserList.ts',
+				'src/lib/server/RoomList.ts'
+			]
 		})
 	]
 });
