@@ -13,6 +13,10 @@ interface __BaseEnv_Env {
 	ROOM_LIST: DurableObjectNamespace /* RoomList */;
 }
 declare namespace Cloudflare {
+	interface GlobalProps {
+		mainModule: typeof import("./.svelte-kit/cloudflare/_worker");
+		durableNamespaces: "ChatRoom" | "UserList" | "RoomList";
+	}
 	interface Env extends __BaseEnv_Env {}
 }
 interface Env extends __BaseEnv_Env {}

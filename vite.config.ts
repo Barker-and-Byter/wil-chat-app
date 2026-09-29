@@ -2,6 +2,7 @@ import tailwindcss from '@tailwindcss/vite';
 import adapter from '@sveltejs/adapter-cloudflare';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
+import cloudflareDoExporter from 'sveltekit-cloudflare-durable-objects';
 
 export default defineConfig({
 	plugins: [
@@ -30,6 +31,13 @@ export default defineConfig({
 					config.include.push('../drizzle.config.ts');
 				}
 			}
+		}),
+		// cloudflareDoExporter({
+		// 	durableObjects: ['src/lib/']
+		// })
+
+		cloudflareDoExporter({
+			durableObjects: ['src/lib/server/ChatRoom.ts', 'src/lib/server/UserList.ts', 'src/lib/server/RoomList.ts'],
 		})
 	]
 });
