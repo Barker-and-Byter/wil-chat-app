@@ -4,12 +4,12 @@ import { command } from '$app/server';
 import { getUserList } from './getSimple.remote';
 import type { User } from '$lib/types/types';
 
-const userArgs = type({ id: 'string', username: 'string' })
+const userArgs = type({ id: "string", username: 'string' })
 const typingArgs = type({ id: 'string', typing: 'boolean' })
 
 export const addUser = command(userArgs, async ({ id, username }) => {
     const userList = getUserList();
-    const { users } = await userList.getUsers()
+    const { users } = await userList.getUsers();
 
     // Define u
     const taken = users.some((u: User) => u.username === username && u.id !== id)

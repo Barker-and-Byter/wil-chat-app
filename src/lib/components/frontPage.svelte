@@ -10,19 +10,26 @@
 	import MessageHeader from './ui/message/message-header.svelte';
 	import Bubble from './ui/bubble/bubble.svelte';
 	import BubbleContent from './ui/bubble/bubble-content.svelte';
+
+    import { getChat, addMessage, deleteMessage } from '$lib/remote/chatRoom.remote';
+    import { addUser } from '$lib/remote/users.remote';
 	import { onMount, tick } from 'svelte';
+
     let inputField = $state("");
     let chatHistory: HTMLDivElement | null = $state(null);
-    let messages = $state([{sender: "Marissa", text: "hello everybody my name is markiplier..."}]);
+
+    const id = crypto.randomUUID();
+    addUser({id: id, username: "jared"});
+    const loadChat = getChat({room: "global", id: id, username: "jared"});
+    let messages = $derived(loadChat.current?.messages);
+    let users = $derived(loadChat.current?.users);
+
 
     async function submit(event: KeyboardEvent){
         if (event.key === 'Enter' && inputField.trim() !== ''){
             event.preventDefault();
 
-            messages = [...messages,{
-                sender: "Marrisa",
-                text: inputField.trim()
-            }];
+            addMessage({room: "global", userId: id, text: inputField.trim()})
 
             inputField = '';
             await tick();
@@ -31,6 +38,7 @@
             }
         }
     }
+
 </script>
 
 <h1>hello</h1>
@@ -47,7 +55,7 @@
 		>
         {#each messages as msg}
             <Message align="end" class="pt-3">
-                <MessageHeader>{msg.sender}</MessageHeader>
+                <MessageHeader>{msg.username}</MessageHeader>
                 <MessageContent>
                     <Bubble>
                         <BubbleContent>{msg.text}</BubbleContent>
