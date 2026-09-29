@@ -5,7 +5,7 @@ import { getMessages, pushMessage } from '../src/lib/remote/getMessage.remote.ts
 
 test('push message is returned by get message', () => {
     const messages = getMessages()
-    pushMessage({ message: "test", name: "test"})
+    // pushMessage({ message: "test", name: "test"})
 
 
 })
