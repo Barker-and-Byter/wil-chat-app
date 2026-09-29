@@ -7,12 +7,19 @@ declare global {
 		interface Locals {
 			user?: User;
 			session?: Session;
+
+			env: {
+				ROOM: DurableObjectNamespace
+				USER_LIST: DurableObjectNamespace
+			}
 		}
 
 		// interface Error {}
 		// interface PageData {}
 		// interface PageState {}
-		// interface Platform {}
+		interface Platform {
+			env: ENV
+		}
 	}
 }
 
