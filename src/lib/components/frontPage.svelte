@@ -29,17 +29,22 @@
 	let messages = $derived(loadChat?.current?.messages ?? []);
 	let users = $derived(loadChat?.current?.users ?? []);
 
-	async function submit(event: KeyboardEvent) {
-		if (event.key === 'Enter' && inputField.trim() !== '') {
+    async function handleSend() {
+        if (inputField.trim() === '') return;
+
+        await addMessage({ room: 'global', userId: id, text: inputField.trim() });
+
+        inputField = '';
+        await tick();
+        if (chatHistory) {
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+    }
+
+	async function handleKeyDown(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
 			event.preventDefault();
-
-			await addMessage({ room: 'global', userId: id, text: inputField.trim() });
-
-			inputField = '';
-			await tick();
-			if (chatHistory) {
-				chatHistory.scrollTop = chatHistory.scrollHeight;
-			}
+            handleSend();
 		}
 	}
 
@@ -51,11 +56,11 @@
 	});
 </script>
 
-{#if !isLoggedIn}
+<!-- {#if !isLoggedIn}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
 		<LoginForm />
 	</div>
-{/if}
+{/if} -->
 
 <div class="flex min-h-screen flex-col items-center justify-center gap-4">
 	<div class="fixed top-5 right-10">
@@ -67,7 +72,7 @@
 			{#each messages as msg}
 				{#if !msg.system}
 					<Message
-						align={msg.username === username ? 'end' : 'start'}
+						align={msg.username === username ? 'start' : 'end'}
 						// aligns at the end when its you aligns at start when it isnt...
 						class="pt-3"
 					>
@@ -91,9 +96,9 @@
 			placeholder="Message..."
 			type="text"
 			bind:value={inputField}
-			onkeydown={submit}
+			onkeydown={handleKeyDown}
 			class="max-w-300"
 		/>
-		<SendButton />
+		<SendButton onclick={handleSend}/>
 	</div>
 </div>
