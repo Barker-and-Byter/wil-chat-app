@@ -11,6 +11,7 @@
 	import Bubble from './ui/bubble/bubble.svelte';
 	import BubbleContent from './ui/bubble/bubble-content.svelte';
 	import { Marker, MarkerContent, MarkerIcon } from '$lib/components/ui/marker';
+	import LoginForm from './login-form.svelte';
 
 	import { getChat, addMessage, deleteMessage } from '$lib/remote/chatRoom.remote';
 	import { addUser } from '$lib/remote/users.remote';
@@ -20,6 +21,7 @@
 	let inputField = $state('');
 	let chatHistory: HTMLDivElement | null = $state(null);
 
+	let isLoggedIn = $state(false);
 	let id = $state('');
 	let username = $state('');
 	let loadChat = $state<any>(null);
@@ -49,8 +51,12 @@
 	});
 </script>
 
-<h1>hello</h1>
-<Button>Click me!</Button>
+{#if !isLoggedIn}
+	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+		<LoginForm />
+	</div>
+{/if}
+
 <div class="flex min-h-screen flex-col items-center justify-center gap-4">
 	<div class="fixed top-5 right-10">
 		<ModeToggle />
