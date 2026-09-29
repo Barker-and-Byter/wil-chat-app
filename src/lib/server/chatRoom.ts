@@ -52,6 +52,6 @@ export class ChatRoom extends DurableObject {
 
 	getState() {
 		// return { version: this.version, messages: this.messages }
-		return { isChanged: this.isChanged, message: this.messages };
+		return { isChanged: this.isChanged, messages: this.messages }; // fixed type
 	}
 }
