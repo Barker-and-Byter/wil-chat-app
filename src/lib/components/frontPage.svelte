@@ -18,6 +18,9 @@
 	import { onMount, tick } from 'svelte';
 	import { createRoom } from '$lib/remote/roomList.remote';
 
+    import { PencilIcon, TrashIcon, EllipsisVertical } from "@lucide/svelte"
+	import { DropdownMenu } from 'bits-ui';
+
 	let inputField = $state('');
 	let chatHistory: HTMLDivElement | null = $state(null);
 
@@ -49,35 +52,110 @@
 		const username = 'jared';
 		loadChat = getChat({ room: 'global', id: id, username: username });
 	});
+
+    async function edit(id: string, text: string) {
+
+    }
+
+    async function delMsg(id: string) {
+        await deleteMessage({ room: 'global', id: id})
+    }
 </script>
 
-{#if !isLoggedIn}
+<!-- {#if !isLoggedIn}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
 		<LoginForm />
 	</div>
-{/if}
+{/if} -->
 
 <div class="flex min-h-screen flex-col items-center justify-center gap-4">
 	<div class="fixed top-5 right-10">
 		<ModeToggle />
 	</div>
-	<h1 class="pb-20 text-9xl font-black">Chatty App</h1>
+	<h1 class="pb-10 text-9xl font-black">Chatty App 89</h1>
 	<ScrollArea class="h-200 w-1/3 rounded-md border p-4">
 		<div bind:this={chatHistory} class="overflow-y h-full">
 			{#each messages as msg}
 				{#if !msg.system}
-					<Message
-						align={msg.username === username ? 'end' : 'start'}
-						// aligns at the end when its you aligns at start when it isnt...
-						class="pt-3"
-					>
-						<MessageHeader>{msg.username}</MessageHeader>
-						<MessageContent>
-							<Bubble>
-								<BubbleContent>{msg.text}</BubbleContent>
-							</Bubble>
-						</MessageContent>
-					</Message>
+
+                    <Message
+                        align={msg.username === username ? 'end' : 'start'}
+                        class="group pt-3"
+                    >
+                        <MessageHeader class="mb-1 px-1 text-xs font-medium text-muted-foreground">
+                            {msg.username}
+                        </MessageHeader>
+
+                        <MessageContent class="relative max-w-[75%]">
+                            <div class="flex items-end gap-1">
+                                <Bubble
+                                    class=" {msg.username == username ? 'rounded-br-sm' : 'rounded-bl-sm'}"
+                                >
+
+                                    <BubbleContent class="px-4 py-2.5 text-sm leading-relaxed">
+                                    {#if edit}
+                                        {msg.text}
+
+                                    {:else }
+                                        <input> 
+                                        <button>
+
+                                        </button>
+                                        <button>
+                                            
+                                        </button>
+                                    {/if}
+                                    </BubbleContent>
+                                </Bubble>
+
+                                {#if msg.userId == id}
+                                    <DropdownMenu.Root>
+                                        <DropdownMenu.Trigger>
+                                            {#snippet child({ props })}
+                                                <Button
+                                                    {...props}
+                                                    variant="ghost"
+                                                    size="icon"
+                                                    class="h-7 w-7 shrink-0"
+                                                    aria-label="Message options"
+                                                >
+                                                    <EllipsisVertical class="h-4 w-4 text-muted-foreground" />
+                                                </Button>
+                                            {/snippet}
+                                        </DropdownMenu.Trigger>
+
+                                        <DropdownMenu.Content
+                                            align={msg.username === username ? 'end' : 'start'}
+                                            class="w-30"
+                                        >
+                                            <DropdownMenu.Item 
+                                                onclick={() => {}} 
+                                                class="p-2 focus:bg-white/5 items-center align-middle"
+                                            >
+                                                <div class = 'flex flex-row gap-x-4'>
+                                                    <PencilIcon class="mr-2 h-4 w-4" />
+                                                    <span>Edit</span>
+                                                </div>
+                                                
+                                            </DropdownMenu.Item>
+
+                                            <DropdownMenu.Item
+                                                class="text-destructive p-2 items-center align-middle  focus:bg-destructive/10 focus:text-destructive"
+                                                onclick={() => delMsg(msg.messageId)}
+                                            >
+                                                <div class = 'flex flex-row gap-x-4'>
+                                                    <TrashIcon class="mr-2 h-4 w-4" />
+                                                    <span>Delete</span>
+                                                </div>
+                                                
+                                            </DropdownMenu.Item>
+                                        </DropdownMenu.Content>
+                                    </DropdownMenu.Root>
+                                {/if}
+                            </div>
+                        </MessageContent>
+                    </Message>
+					
 				{:else}
 					<Marker variant="separator" class="pt-3">
 						<MarkerContent>{msg.text}</MarkerContent>
