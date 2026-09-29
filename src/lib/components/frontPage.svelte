@@ -29,6 +29,13 @@
 	let messages = $derived(loadChat?.current?.messages ?? []);
 	let users = $derived(loadChat?.current?.users ?? []);
 
+    async function completeLogin(submittedUsername: string){
+        username = submittedUsername;
+        isLoggedIn = true;
+
+		loadChat = getChat({ room: 'global', id: id, username: username });
+    }
+
     async function handleSend() {
         if (inputField.trim() === '') return;
 
@@ -51,16 +58,14 @@
 	onMount(() => {
 		id = crypto.randomUUID();
 		createRoom({ name: 'global' });
-		const username = 'jared';
-		loadChat = getChat({ room: 'global', id: id, username: username });
 	});
 </script>
 
-<!-- {#if !isLoggedIn}
+{#if !isLoggedIn}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-		<LoginForm />
+		<LoginForm onLogin={completeLogin} />
 	</div>
-{/if} -->
+{/if}
 
 <div class="flex min-h-screen flex-col items-center justify-center gap-4">
 	<div class="fixed top-5 right-10">

@@ -9,7 +9,19 @@
 	} from '$lib/components/ui/field/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 
+	let { onLogin }: { OnLogin: (username: string) => void } = $props();
+
 	const id = $props.id();
+
+	let username = $state("");
+
+	function handleLogin(event: SubmitEvent) {
+		event.preventDefault();
+		if (username.trim()){
+			onLogin(username.trim());
+		}
+	}
+
 </script>
 
 <Card.Root class="mx-auto w-full max-w-sm">
@@ -18,11 +30,11 @@
 		<Card.Description>Please enter a username to start chatting!</Card.Description>
 	</Card.Header>
 	<Card.Content>
-		<form>
+		<form onsubmit={handleLogin}>
 			<FieldGroup>
 				<Field>
-					<FieldLabel for="email-{id}">Username</FieldLabel>
-					<Input id="email-{id}" placeholder="Username" required />
+					<FieldLabel for="username-{id}">Username</FieldLabel>
+					<Input id="username-{id}" placeholder="Username" required bind:value={username} />
 				</Field>
 				<Field>
 					<Button type="submit" class="w-full">Login</Button>
