@@ -17,10 +17,10 @@ export const getChat = query.live(chatArgs, async function* ({ room, id, usernam
 
     if (isNew) {
         await chatRoom.addMessage({
-        id: crypto.randomUUID(),
-        username,
-        text: `${username} joined the chat`,
-        system: true
+            id: crypto.randomUUID(),
+            username,
+            text: `${username} joined the chat`,
+            system: true
         })
     }
 
@@ -44,7 +44,7 @@ export const getChat = query.live(chatArgs, async function* ({ room, id, usernam
 
 
             if (msgState.isChanged || userState.isChanged) {
-                last = { messages: msgState.message, users: userState.users }
+                last = { messages: msgState.message, users: {id, ...userState.users} }
                 chatRoom.acknowledgeChange()
                 userList.acknowledgeChange()
                 yield last
