@@ -20,7 +20,7 @@
 
 	let inputField = $state('');
 	let chatHistory: HTMLDivElement | null = $state(null);
-
+    
 	let isLoggedIn = $state(false);
 	let id = $state('');
 	let username = $state('');
@@ -33,7 +33,7 @@
         username = submittedUsername;
         isLoggedIn = true;
 
-		loadChat = await getChat({ room: 'global', id: id, username: username });
+		loadChat = getChat({ room: 'global', id: id, username: username });
     }
 
     async function handleSend() {
