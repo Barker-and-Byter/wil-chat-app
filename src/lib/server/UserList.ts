@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+
 import { DurableObject } from 'cloudflare:workers';
 import type { User } from '$lib/types/types';
 
@@ -68,6 +68,6 @@ export class UserList extends DurableObject {
 		this.users = active;
 
 		// return { version: this.version, users: this.users }
-		return { isChanged: this.isChanged, user: this.users };
+		return { isChanged: this.isChanged, users: this.users }; // typo was user not users
 	}
 }

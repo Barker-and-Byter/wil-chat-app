@@ -26,3 +26,7 @@ vite.config.ts.timestamp-*
 
 .dev.vars*
 !.dev.vars.example
+
+# other
+.platform-proxy-wrangler.jsonc
+.dev-worker-wrangler.jsonc

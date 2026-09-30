@@ -32,7 +32,7 @@ export class ChatRoom extends DurableObject {
 	}
 
 	deleteMessage(id: string) {
-		const index = this.messages.findIndex((m) => m.id === id);
+		const index = this.messages.findIndex((m) => m.messageId === id);
 
 		if (index !== -1) {
 			this.messages.splice(index, 1);
@@ -41,8 +41,18 @@ export class ChatRoom extends DurableObject {
 		}
 	}
 
+	editMessage(messageId: string, text: string) {
+		const index = this.messages.findIndex((m) => m.messageId === messageId)
+
+		if (index !== -1) {
+			this.messages[index].text = text
+			console.log(this.messages[index])
+			this.isChanged = true
+		}
+	}
+
 	getState() {
 		// return { version: this.version, messages: this.messages }
-		return { isChanged: this.isChanged, message: this.messages };
+		return { isChanged: this.isChanged, messages: this.messages }; // fixed type
 	}
 }
