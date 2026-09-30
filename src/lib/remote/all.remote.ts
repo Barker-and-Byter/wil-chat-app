@@ -87,6 +87,7 @@ export const getChat = query.live(chatSchema, async function* ({ roomId, userId 
         while (true) {
             const change = currentResolver.promise
 
+            // might be better to have two functions, one yielding typing, one messages?
             yield {...thisRoom, messages: getMessages(roomId), typing: getTypingUsers(thisRoom) }
             // await Promise.race([change, new Promise(resolve => setTimeout(resolve, 5000))])
             await change
@@ -112,7 +113,9 @@ export const addMessage = command(messageSchema, async ({ roomId, userId, text }
     if (!thisUser) error(400, 'You need to join before sending messages');
 
     pushMessage(thisRoom, thisUser, text)
-});
+
+    if (messages.length > 200) messages.shift()
+})
 
 // Need to add some validation
 export const deleteMessage = command(deleteSchema, async ({ roomId, messageId }) => {
