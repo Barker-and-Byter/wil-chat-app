@@ -185,14 +185,14 @@
 									<BubbleContent class="px-4 py-2.5 text-sm leading-relaxed">
 										{#if msg.messageId == editMessageId}
 											<input
-												class="w-full min-w-0 bg-transparent outline-none"
+												class="w-full text-sm min-w-0 bg-transparent outline-none rounded-md"
 												bind:value={editInput}
-												{@attach (node) => node.focus()}
 												onkeydown={(e) => {
 													if (e.key === 'Enter') editApply();
 													if (e.key === 'Escape') cancelEdit();
 												}}
 												onblur={cancelEdit}
+
 											/>
 										{:else}
 											{msg.text}
