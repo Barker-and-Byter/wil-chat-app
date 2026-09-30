@@ -35,7 +35,6 @@ export default defineConfig({
 		// cloudflareDoExporter({
 		// 	durableObjects: ['src/lib/']
 		// })
-
 		cloudflareDoExporter({
 			durableObjects: [
 				'src/lib/server/ChatRoom.ts',
@@ -43,5 +42,6 @@ export default defineConfig({
 				'src/lib/server/RoomList.ts'
 			]
 		})
+
 	]
 });

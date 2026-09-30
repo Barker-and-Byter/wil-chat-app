@@ -18,15 +18,16 @@
 	import { onMount, tick } from 'svelte';
 	import { createRoom } from '$lib/remote/roomList.remote';
 
-    import { PencilIcon, TrashIcon, EllipsisVertical } from "@lucide/svelte"
+  import { PencilIcon, TrashIcon, EllipsisVertical } from "@lucide/svelte"
 	import { DropdownMenu } from 'bits-ui';
 
 	let inputField = $state('');
 	let chatHistory: HTMLDivElement | null = $state(null);
 
-    let editMessageId = $state('')
-    let editInput = $state('')
+  let editMessageId = $state('')
+  let editInput = $state('')
 
+    
 	let isLoggedIn = $state(false);
 	let id = $state('');
 	let username = $state('');
@@ -35,25 +36,37 @@
 	let messages = $derived(loadChat?.current?.messages ?? []);
 	let users = $derived(loadChat?.current?.users ?? []);
 
-	async function submit(event: KeyboardEvent) {
-		if (event.key === 'Enter' && inputField.trim() !== '') {
+    async function completeLogin(submittedUsername: string){
+        username = submittedUsername;
+        isLoggedIn = true;
+
+		loadChat = getChat({ room: 'global', id: id, username: username });
+    }
+
+    async function handleSend() {
+        if (inputField.trim() === '') return;
+
+        await addMessage({ room: 'global', userId: id, text: inputField.trim() });
+
+        inputField = '';
+        await tick();
+        if (chatHistory) {
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+        }
+    }
+
+	async function handleKeyDown(event: KeyboardEvent) {
+		if (event.key === 'Enter') {
 			event.preventDefault();
-
-			await addMessage({ room: 'global', userId: id, text: inputField.trim() });
-
-			inputField = '';
-			await tick();
-			if (chatHistory) {
-				chatHistory.scrollTop = chatHistory.scrollHeight;
-			}
+            handleSend();
 		}
 	}
 
 	onMount(() => {
 		id = crypto.randomUUID();
 		createRoom({ name: 'global' });
-		const username = 'jared';
-        addUser({ id: id, username: username})
+		const username = 'jared'; // This was added in merge, may change
+    addUser({ id: id, username: username}) // Same with this
 		loadChat = getChat({ room: 'global', id: id, username: username });
 	});
 
@@ -68,7 +81,7 @@
 
 <!-- {#if !isLoggedIn}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
-		<LoginForm />
+		<LoginForm onLogin={completeLogin} />
 	</div>
 {/if} -->
 
@@ -173,9 +186,9 @@
 			placeholder="Message..."
 			type="text"
 			bind:value={inputField}
-			onkeydown={submit}
+			onkeydown={handleKeyDown}
 			class="max-w-300"
 		/>
-		<SendButton />
+		<SendButton onclick={handleSend}/>
 	</div>
 </div>
