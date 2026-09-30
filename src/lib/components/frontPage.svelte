@@ -142,8 +142,7 @@
 													{...props}
 													variant="ghost"
 													size="icon"
-													class="h-7 w-7 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100 data-[state=open]:opacity-100"
-													aria-label="Message options"
+													class="h-7 w-7 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
 												>
 													<EllipsisVertical class="h-4 w-4 text-muted-foreground" />
 												</Button>
