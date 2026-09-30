@@ -43,21 +43,16 @@
 	}
 
 	async function handleSend() {
-		if (inputField.trim() === '') return;
+        const thisInput = inputField.trim()
 
-		await addMessage({ room: 'global', userId: id, text: inputField.trim() });
+		if (thisInput === '') return;
+
+		await addMessage({ room: 'global', userId: id, text: thisInput });
 
 		inputField = '';
 		await tick();
 		if (chatHistory) {
 			chatHistory.scrollTop = chatHistory.scrollHeight;
-		}
-	}
-
-	async function handleKeyDown(event: KeyboardEvent) {
-		if (event.key === 'Enter') {
-			event.preventDefault();
-			handleSend();
 		}
 	}
 
@@ -105,11 +100,7 @@
 										{#if msg.messageId == editMessageId}
 											<input
 												bind:value={editInput}
-												onkeydown={(e) => {
-													if (e.key === 'Enter') {
-														editApply();
-													}
-												}}
+												onkeydown={(e) => { if (e.key === 'Enter') editApply() }}
 												onblur={() => {
 													editMessageId = '';
 													editInput = '';
@@ -182,7 +173,7 @@
 			placeholder="Message..."
 			type="text"
 			bind:value={inputField}
-			onkeydown={handleKeyDown}
+			onkeydown={(e) => { if (e.key === "Enter") handleSend() }} 
 			class="max-w-300"
 		/>
 		<SendButton onclick={handleSend} />
