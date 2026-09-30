@@ -88,7 +88,8 @@ export const getChat = query.live(chatSchema, async function* ({ roomId, userId 
             const change = currentResolver.promise
 
             yield {...thisRoom, messages: getMessages(roomId), typing: getTypingUsers(thisRoom) }
-            await Promise.race([change, new Promise(resolve => setTimeout(resolve, 5000))])
+            // await Promise.race([change, new Promise(resolve => setTimeout(resolve, 5000))])
+            await change
         }
 
     } finally {
