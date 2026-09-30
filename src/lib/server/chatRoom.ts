@@ -41,11 +41,12 @@ export class ChatRoom extends DurableObject {
 		}
 	}
 
-	editMessage(id: string, text: string) {
-		const index = this.messages.findIndex((m) => m.messageId === id)
+	editMessage(messageId: string, text: string) {
+		const index = this.messages.findIndex((m) => m.messageId === messageId)
 
 		if (index !== -1) {
 			this.messages[index].text = text
+			console.log(this.messages[index])
 			this.isChanged = true
 		}
 	}
