@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+
 import { DurableObject } from 'cloudflare:workers';
 import type { Room } from '$lib/types/types';
 
