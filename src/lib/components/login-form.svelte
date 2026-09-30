@@ -13,15 +13,14 @@
 
 	const id = $props.id();
 
-	let username = $state("");
+	let username = $state('');
 
 	function handleLogin(event: SubmitEvent) {
 		event.preventDefault();
-		if (username.trim()){
+		if (username.trim()) {
 			onLogin(username.trim());
 		}
 	}
-
 </script>
 
 <Card.Root class="mx-auto w-full max-w-sm">
@@ -34,7 +33,14 @@
 			<FieldGroup>
 				<Field>
 					<FieldLabel for="username-{id}">Username</FieldLabel>
-					<Input id="username-{id}" placeholder="Username" required bind:value={username} maxlength="20" minlength="3"/>
+					<Input
+						id="username-{id}"
+						placeholder="Username"
+						required
+						bind:value={username}
+						maxlength="20"
+						minlength="3"
+					/>
 				</Field>
 				<Field>
 					<Button type="submit" class="w-full">Login</Button>

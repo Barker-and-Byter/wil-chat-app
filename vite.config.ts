@@ -42,6 +42,5 @@ export default defineConfig({
 				'src/lib/server/RoomList.ts'
 			]
 		})
-
 	]
 });

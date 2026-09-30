@@ -18,16 +18,15 @@
 	import { onMount, tick } from 'svelte';
 	import { createRoom } from '$lib/remote/roomList.remote';
 
-  import { PencilIcon, TrashIcon, EllipsisVertical } from "@lucide/svelte"
+	import { PencilIcon, TrashIcon, EllipsisVertical } from '@lucide/svelte';
 	import { DropdownMenu } from 'bits-ui';
 
 	let inputField = $state('');
 	let chatHistory: HTMLDivElement | null = $state(null);
 
-  let editMessageId = $state('')
-  let editInput = $state('')
+	let editMessageId = $state('');
+	let editInput = $state('');
 
-    
 	let isLoggedIn = $state(false);
 	let id = $state('');
 	let username = $state('');
@@ -36,54 +35,54 @@
 	let messages = $derived(loadChat?.current?.messages ?? []);
 	let users = $derived(loadChat?.current?.users ?? []);
 
-    async function completeLogin(submittedUsername: string){
-        username = submittedUsername;
-        isLoggedIn = true;
+	async function completeLogin(submittedUsername: string) {
+		username = submittedUsername;
+		isLoggedIn = true;
 
 		loadChat = getChat({ room: 'global', id: id, username: username });
-    }
+	}
 
-    async function handleSend() {
-        if (inputField.trim() === '') return;
+	async function handleSend() {
+		if (inputField.trim() === '') return;
 
-        await addMessage({ room: 'global', userId: id, text: inputField.trim() });
+		await addMessage({ room: 'global', userId: id, text: inputField.trim() });
 
-        inputField = '';
-        await tick();
-        if (chatHistory) {
-            chatHistory.scrollTop = chatHistory.scrollHeight;
-        }
-    }
+		inputField = '';
+		await tick();
+		if (chatHistory) {
+			chatHistory.scrollTop = chatHistory.scrollHeight;
+		}
+	}
 
 	async function handleKeyDown(event: KeyboardEvent) {
 		if (event.key === 'Enter') {
 			event.preventDefault();
-            handleSend();
+			handleSend();
 		}
 	}
 
 	onMount(() => {
 		id = crypto.randomUUID();
 		createRoom({ name: 'global' });
-		const username = 'jared'; // This was added in merge, may change
-    addUser({ id: id, username: username}) // Same with this
+		// const username = 'jared'; // This was added in merge, may change
+		addUser({ id: id, username: username }); // Same with this
 		loadChat = getChat({ room: 'global', id: id, username: username });
 	});
 
-    async function editApply() {
-        await editMessage({ room: 'global', messageId: editMessageId, text: editInput})
-    }
+	async function editApply() {
+		await editMessage({ room: 'global', messageId: editMessageId, text: editInput });
+	}
 
-    async function delMsg(id: string) {
-        await deleteMessage({ room: 'global', id: id})
-    }
+	async function delMsg(id: string) {
+		await deleteMessage({ room: 'global', id: id });
+	}
 </script>
 
-<!-- {#if !isLoggedIn}
+{#if !isLoggedIn}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
 		<LoginForm onLogin={completeLogin} />
 	</div>
-{/if} -->
+{/if}
 
 <div class="flex min-h-screen flex-col items-center justify-center gap-4">
 	<div class="fixed top-5 right-10">
@@ -94,85 +93,82 @@
 		<div bind:this={chatHistory} class="overflow-y h-full">
 			{#each messages as msg (msg.messageId)}
 				{#if !msg.system}
+					<Message align={msg.username === username ? 'end' : 'start'} class="group pt-3">
+						<MessageHeader class="mb-1 px-1 text-xs font-medium text-muted-foreground">
+							{msg.username}
+						</MessageHeader>
 
-                    <Message
-                        align={msg.username === username ? 'end' : 'start'}
-                        class="group pt-3"
-                    >
-                        <MessageHeader class="mb-1 px-1 text-xs font-medium text-muted-foreground">
-                            {msg.username}
-                        </MessageHeader>
+						<MessageContent class="relative max-w-[75%]">
+							<div class="flex items-end gap-1">
+								<Bubble class=" {msg.username == username ? 'rounded-br-sm' : 'rounded-bl-sm'}">
+									<BubbleContent class="px-4 py-2.5 text-sm leading-relaxed">
+										{#if msg.messageId == editMessageId}
+											<input
+												bind:value={editInput}
+												onkeydown={(e) => {
+													if (e.key === 'Enter') {
+														editApply();
+													}
+												}}
+												onblur={() => {
+													editMessageId = '';
+													editInput = '';
+												}}
+											/>
+										{:else}
+											{msg.text}
+										{/if}
+									</BubbleContent>
+								</Bubble>
 
-                        <MessageContent class="relative max-w-[75%]">
-                            <div class="flex items-end gap-1">
-                                <Bubble
-                                    class=" {msg.username == username ? 'rounded-br-sm' : 'rounded-bl-sm'}"
-                                >
+								{#if msg.userId == id}
+									<DropdownMenu.Root>
+										<DropdownMenu.Trigger>
+											{#snippet child({ props })}
+												<Button
+													{...props}
+													variant="ghost"
+													size="icon"
+													class="h-7 w-7 shrink-0"
+													aria-label="Message options"
+												>
+													<EllipsisVertical class="h-4 w-4 text-muted-foreground" />
+												</Button>
+											{/snippet}
+										</DropdownMenu.Trigger>
 
-                                    <BubbleContent class="px-4 py-2.5 text-sm leading-relaxed">
-                                    {#if msg.messageId == editMessageId}
-                                        <input
-                                            bind:value={editInput}
-                                            onkeydown={(e) => {if (e.key === 'Enter') { editApply()}}}
-                                            onblur={() => {editMessageId = ''; editInput = ''}}
+										<DropdownMenu.Content
+											align={msg.username === username ? 'end' : 'start'}
+											class="w-30"
+										>
+											<DropdownMenu.Item
+												onclick={() => {
+													editMessageId = msg.messageId;
+													editInput = msg.text;
+												}}
+												class="items-center p-2 align-middle focus:bg-white/5"
+											>
+												<div class="flex flex-row gap-x-4">
+													<PencilIcon class="mr-2 h-4 w-4" />
+													<span>Edit</span>
+												</div>
+											</DropdownMenu.Item>
 
-                                        > 
-
-                                    {:else }
-                                        {msg.text}
-                                       
-                                    {/if}
-                                    </BubbleContent>
-                                </Bubble>
-
-                                {#if msg.userId == id}
-                                    <DropdownMenu.Root>
-                                        <DropdownMenu.Trigger>
-                                            {#snippet child({ props })}
-                                                <Button
-                                                    {...props}
-                                                    variant="ghost"
-                                                    size="icon"
-                                                    class="h-7 w-7 shrink-0"
-                                                    aria-label="Message options"
-                                                >
-                                                    <EllipsisVertical class="h-4 w-4 text-muted-foreground" />
-                                                </Button>
-                                            {/snippet}
-                                        </DropdownMenu.Trigger>
-
-                                        <DropdownMenu.Content
-                                            align={msg.username === username ? 'end' : 'start'}
-                                            class="w-30"
-                                        >
-                                            <DropdownMenu.Item 
-                                                onclick={() => {editMessageId = msg.messageId; editInput = msg.text}} 
-                                                class="p-2 focus:bg-white/5 items-center align-middle"
-                                            >
-                                                <div class = 'flex flex-row gap-x-4'>
-                                                    <PencilIcon class="mr-2 h-4 w-4" />
-                                                    <span>Edit</span>
-                                                </div>
-                                                
-                                            </DropdownMenu.Item>
-
-                                            <DropdownMenu.Item
-                                                class="text-destructive p-2 items-center align-middle  focus:bg-destructive/10 focus:text-destructive"
-                                                onclick={() => delMsg(msg.messageId)}
-                                            >
-                                                <div class = 'flex flex-row gap-x-4'>
-                                                    <TrashIcon class="mr-2 h-4 w-4" />
-                                                    <span>Delete</span>
-                                                </div>
-                                                
-                                            </DropdownMenu.Item>
-                                        </DropdownMenu.Content>
-                                    </DropdownMenu.Root>
-                                {/if}
-                            </div>
-                        </MessageContent>
-                    </Message>
-					
+											<DropdownMenu.Item
+												class="items-center p-2 align-middle text-destructive  focus:bg-destructive/10 focus:text-destructive"
+												onclick={() => delMsg(msg.messageId)}
+											>
+												<div class="flex flex-row gap-x-4">
+													<TrashIcon class="mr-2 h-4 w-4" />
+													<span>Delete</span>
+												</div>
+											</DropdownMenu.Item>
+										</DropdownMenu.Content>
+									</DropdownMenu.Root>
+								{/if}
+							</div>
+						</MessageContent>
+					</Message>
 				{:else}
 					<Marker variant="separator" class="pt-3">
 						<MarkerContent>{msg.text}</MarkerContent>
@@ -189,6 +185,6 @@
 			onkeydown={handleKeyDown}
 			class="max-w-300"
 		/>
-		<SendButton onclick={handleSend}/>
+		<SendButton onclick={handleSend} />
 	</div>
 </div>

@@ -5,7 +5,7 @@
 	let { onclick, ...restProps } = $props();
 </script>
 
-<Button variant="outline" size="icon" onclick={onclick} {...restProps}>
+<Button variant="outline" size="icon" {onclick} {...restProps}>
 	<Send />
 </Button>
 z

@@ -9,8 +9,8 @@ interface __BaseEnv_Env {
 }
 declare namespace Cloudflare {
 	interface GlobalProps {
-		mainModule: typeof import("./.svelte-kit/cloudflare/_worker");
-		durableNamespaces: "ChatRoom" | "UserList" | "RoomList";
+		mainModule: typeof import('./.svelte-kit/cloudflare/_worker');
+		durableNamespaces: 'ChatRoom' | 'UserList' | 'RoomList';
 	}
 	interface Env extends __BaseEnv_Env {}
 }
