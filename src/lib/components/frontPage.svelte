@@ -3,7 +3,7 @@
 	import ModeToggle from '$lib/components/ui/modeToggle/modeToggle.svelte';
 	import SendButton from '$lib/components/ui/sendButton/send.svelte';
 	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
-	import { Scrollbar } from '$lib/components/ui/scroll-area';
+
 	import { Input } from '$lib/components/ui/input';
 	import Message from './ui/message/message.svelte';
 	import MessageContent from './ui/message/message-content.svelte';
@@ -93,13 +93,8 @@
 
 		if (thisInput === '') return;
 
-		await addMessage({ roomId: roomId, userId: id, text: thisInput })
-
 		inputField = ''
-		await tick()
-		if (chatHistory) {
-			chatHistory.scrollTop = chatHistory.scrollHeight;
-		}
+        await addMessage({ roomId: roomId, userId: id, text: thisInput })
 	}
 
 	onMount(() => {
@@ -168,13 +163,17 @@
 													editMessageId = msg.messageId;
 													editInput = msg.text;
 												}}
+                                                class="focus:bg-white/10 px-2 py-1 rounded-md flex flex-row gap-2 items-center"
 											>
-												<PencilIcon />
+												<PencilIcon size={14} />
 												Edit
 											</DropdownMenu.Item>
  
-											<DropdownMenu.Item class="text-destructive focus:bg-destructive/10 focus:text-destructive" onclick={() => delMsg(msg.messageId)}>
-												<TrashIcon />
+											<DropdownMenu.Item 
+                                                class="flex flex-row gap-2 px-2 py-1 rounded-md items-center text-destructive focus:bg-destructive/10 focus:text-destructive" 
+                                                onclick={() => delMsg(msg.messageId)}
+                                            >
+												<TrashIcon size={14} />
 												Delete
 											</DropdownMenu.Item>
 
