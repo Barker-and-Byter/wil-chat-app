@@ -39,15 +39,28 @@
     let typingText = $derived.by(() => {
 		const names = typingUsers.map((u: any) => u.username);
  
-		if (names.length === 0) return '';
-		if (names.length === 1) return `${names[0]} is typing...`;
-		if (names.length === 2) return `${names[0]} and ${names[1]} are typing...`;
-		return 'Several people are typing...';
+		if (names.length === 0) return ''
+		if (names.length === 1) return `${names[0]} is typing...`
+		if (names.length === 2) return `${names[0]} and ${names[1]} are typing...`
+		return 'Several people are typing...'
 	});
 
     let isTyping = false;
 
     let typingTimeout: ReturnType<typeof setTimeout>
+
+    const scrollToBottom = async () => {
+        await tick()
+        if (chatHistory) {
+            chatHistory.scrollTop = chatHistory.scrollHeight
+        }
+    }
+
+    $effect(() => {
+        messages.length;
+        typingText;
+        scrollToBottom();
+    })
 
     function handleTyping() {
 		if (!isTyping) {
@@ -121,7 +134,7 @@
 	</div>
 	<h1 class="pb-10 text-9xl font-black">Chatty App</h1>
     
-	<ScrollArea class="h-150 w-1/3 rounded-md border p-4">
+	<ScrollArea class="h-150 w-1/3 rounded-md border p-4" bind:viewportRef={chatHistory}>
 		<div class="h-full">
 			{#each messages as msg (msg.messageId)}
 				{#if !msg.system}
