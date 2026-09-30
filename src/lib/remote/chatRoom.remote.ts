@@ -7,13 +7,13 @@ import type { Message, User } from '$lib/types/types';
 const chatArgs = type({ room: 'string', id: 'string', username: 'string' });
 const messageArgs = type({ room: 'string', userId: 'string', text: 'string' });
 const deleteArgs = type({ room: 'string', id: 'string' });
-const editArgs = type({ room: 'string', userId: "string", text: "string"})
+const editArgs = type({ room: 'string', messageId: "string", text: "string"})
 
 export const getChat = query.live(chatArgs, async function* ({ room, id, username }) {
 	const chatRoom = getRoom(room);
 	const userList = getUserList();
 
-    await userList.addUser(id, username);
+
 
 	const isNew = await chatRoom.join(id);
 	
@@ -30,7 +30,9 @@ export const getChat = query.live(chatArgs, async function* ({ room, id, usernam
 
 	//   let lastMessageVersion = -1
 	//   let lastUserVersion = -1
-	let last = { messages: [] as Message[], users: [] as User[] };
+	// let last = { messages: [] as Message[], users: [] as User[] };
+
+    let last: { messages: Message[], users: User[] }
 
 	try {
 		while (true) {
@@ -47,7 +49,7 @@ export const getChat = query.live(chatArgs, async function* ({ room, id, usernam
 			//   }
 
 			if (msgState.isChanged || userState.isChanged) {
-				last = { messages: msgState.message, users: userState.users  };
+				last = { messages: msgState.messages, users: userState.users  };
 				chatRoom.acknowledgeChange();
 				userList.acknowledgeChange();
 				yield last;
@@ -76,7 +78,9 @@ export const addMessage = command(messageArgs, async ({ room, userId, text }) =>
 		error(400, 'You need to join before sending messages');
 	}
 
-	await chatRoom.addMessage({ messageId: crypto.randomUUID(), userId: userId, username: username, text: text });
+	const result = await chatRoom.addMessage({ messageId: crypto.randomUUID(), userId: userId, username: username, text: text });
+
+    console.log(result)
 });
 
 // Need to add some validation
@@ -85,6 +89,6 @@ export const deleteMessage = command(deleteArgs, async ({ room, id }) => {
 });
 
 // need to add some validation, non users can't change id
-export const editMessage = command(editArgs, async ({ room, userId, text }) => {
-    await getRoom(room).editMessage(userId, text)
+export const editMessage = command(editArgs, async ({ room, messageId, text }) => {
+    await getRoom(room).editMessage(messageId, text)
 })
