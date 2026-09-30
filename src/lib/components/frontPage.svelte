@@ -38,7 +38,7 @@
 	async function completeLogin(submittedUsername: string) {
 		username = submittedUsername;
 		isLoggedIn = true;
-
+        addUser({ id: id, username: username }); // Same with this
 		loadChat = getChat({ room: 'global', id: id, username: username });
 	}
 
@@ -65,8 +65,8 @@
 		id = crypto.randomUUID();
 		createRoom({ name: 'global' });
 		// const username = 'jared'; // This was added in merge, may change
-		addUser({ id: id, username: username }); // Same with this
-		loadChat = getChat({ room: 'global', id: id, username: username });
+		
+		// loadChat = getChat({ room: 'global', id: id, username: username });
 	});
 
 	async function editApply() {
@@ -88,7 +88,7 @@
 	<div class="fixed top-5 right-10">
 		<ModeToggle />
 	</div>
-	<h1 class="pb-10 text-9xl font-black">Chatty App 89</h1>
+	<h1 class="pb-10 text-9xl font-black">Chatty App</h1>
 	<ScrollArea class="h-200 w-1/3 rounded-md border p-4">
 		<div bind:this={chatHistory} class="overflow-y h-full">
 			{#each messages as msg (msg.messageId)}
