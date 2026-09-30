@@ -13,7 +13,7 @@
 	import { Marker, MarkerContent, MarkerIcon } from '$lib/components/ui/marker';
 	import LoginForm from './login-form.svelte';
 
-	import { getChat, addMessage, deleteMessage } from '$lib/remote/chatRoom.remote';
+	import { getChat, addMessage, deleteMessage, editMessage } from '$lib/remote/chatRoom.remote';
 	import { addUser } from '$lib/remote/users.remote';
 	import { onMount, tick } from 'svelte';
 	import { createRoom } from '$lib/remote/roomList.remote';
@@ -23,6 +23,9 @@
 
 	let inputField = $state('');
 	let chatHistory: HTMLDivElement | null = $state(null);
+
+    let editMessageId = $state('')
+    let editInput = $state('')
 
 	let isLoggedIn = $state(false);
 	let id = $state('');
@@ -50,11 +53,12 @@
 		id = crypto.randomUUID();
 		createRoom({ name: 'global' });
 		const username = 'jared';
+        addUser({ id: id, username: username})
 		loadChat = getChat({ room: 'global', id: id, username: username });
 	});
 
-    async function edit(id: string, text: string) {
-
+    async function editApply() {
+        await editMessage({ room: 'global', messageId: editMessageId, text: editInput})
     }
 
     async function delMsg(id: string) {
@@ -75,7 +79,7 @@
 	<h1 class="pb-10 text-9xl font-black">Chatty App 89</h1>
 	<ScrollArea class="h-200 w-1/3 rounded-md border p-4">
 		<div bind:this={chatHistory} class="overflow-y h-full">
-			{#each messages as msg}
+			{#each messages as msg (msg.messageId)}
 				{#if !msg.system}
 
                     <Message
@@ -93,17 +97,17 @@
                                 >
 
                                     <BubbleContent class="px-4 py-2.5 text-sm leading-relaxed">
-                                    {#if edit}
-                                        {msg.text}
+                                    {#if msg.messageId == editMessageId}
+                                        <input
+                                            bind:value={editInput}
+                                            onkeydown={(e) => {if (e.key === 'Enter') { editApply()}}}
+                                            onblur={() => {editMessageId = ''; editInput = ''}}
+
+                                        > 
 
                                     {:else }
-                                        <input> 
-                                        <button>
-
-                                        </button>
-                                        <button>
-                                            
-                                        </button>
+                                        {msg.text}
+                                       
                                     {/if}
                                     </BubbleContent>
                                 </Bubble>
@@ -129,7 +133,7 @@
                                             class="w-30"
                                         >
                                             <DropdownMenu.Item 
-                                                onclick={() => {}} 
+                                                onclick={() => {editMessageId = msg.messageId; editInput = msg.text}} 
                                                 class="p-2 focus:bg-white/5 items-center align-middle"
                                             >
                                                 <div class = 'flex flex-row gap-x-4'>
