@@ -4,12 +4,32 @@ import type { User, Session } from 'better-auth';
 // for information about these interfaces
 declare global {
 	namespace App {
-		interface Locals { user?: User; session?: Session }
+		interface Locals {
+			user?: User;
+			session?: Session;
+
+			env: {
+				ROOM: DurableObjectNamespace;
+				USER_LIST: DurableObjectNamespace;
+			};
+		}
 
 		// interface Error {}
 		// interface PageData {}
 		// interface PageState {}
-		// interface Platform {}
+
+		interface Platform {
+			env: ENV;
+		}
+		// interface Platform {
+		// 	env: {
+		// 		COUNTER: DurableObjectNamespace;
+		// 	};
+		// 	context: {
+		// 		waitUntil(promise: Promise<any>): void;
+		// 	};
+		// 	caches: CacheStorage & { default: Cache }
+		// }
 	}
 }
 

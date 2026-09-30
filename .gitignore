@@ -23,3 +23,10 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 # SQLite
 *.db
+
+.dev.vars*
+!.dev.vars.example
+
+# other
+.platform-proxy-wrangler.jsonc
+.dev-worker-wrangler.jsonc
