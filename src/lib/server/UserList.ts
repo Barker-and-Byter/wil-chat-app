@@ -3,12 +3,13 @@ import type { User } from '$lib/types/types';
 
 export class UserList extends DurableObject {
 	users: User[] = [];
-	// version = 0
-	isChanged = false;
+	version = 0
+    maxVersion = 500
+	// isChanged = false;
 
-	acknowledgeChange() {
-		this.isChanged = false;
-	}
+	// acknowledgeChange() {
+	// 	this.isChanged = false;
+	// }
 
 	addUser(id: string, username: string) {
 		const exists = this.users.some((u) => u.id === id);
@@ -22,7 +23,8 @@ export class UserList extends DurableObject {
 		if (!exists && !isTaken) {
 			this.users.push({ id, username, typing: false, lastSeen: Date.now() });
 			// this.version++
-			this.isChanged = true;
+            this.version = (this.version % this.maxVersion) + 1
+			// this.isChanged = true;
 		}
 	}
 
@@ -41,7 +43,9 @@ export class UserList extends DurableObject {
 
 		if (index !== -1) {
 			this.users.splice(index, 1);
-			this.isChanged = true;
+			// this.isChanged = true;
+            // this.version++
+            this.version = (this.version % this.maxVersion) + 1
 		}
 	}
 
@@ -50,7 +54,9 @@ export class UserList extends DurableObject {
 
 		if (user) {
 			user.typing = isTyping;
-			this.isChanged = true;
+			// this.isChanged = true;
+            // this.version++
+            this.version = (this.version % this.maxVersion) + 1
 		}
 	}
 
@@ -61,12 +67,14 @@ export class UserList extends DurableObject {
 
 		// if something in user list changed add new version
 		if (active.length !== this.users.length) {
-			this.isChanged = true;
+			// this.isChanged = true;
+            // this.version++
+            this.version = (this.version % this.maxVersion) + 1
 		}
 
 		this.users = active;
 
-		// return { version: this.version, users: this.users }
-		return { isChanged: this.isChanged, users: this.users }; // typo was user not users
+		return { version: this.version, users: this.users }
+		// return { isChanged: this.isChanged, users: this.users }; // typo was user not users
 	}
 }

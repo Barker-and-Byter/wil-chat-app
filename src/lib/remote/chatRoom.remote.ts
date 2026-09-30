@@ -25,11 +25,11 @@ export const getChat = query.live(chatArgs, async function* ({ room, id, usernam
 		});
 	}
 
-	//   let lastMessageVersion = -1
-	//   let lastUserVersion = -1
-	// let last = { messages: [] as Message[], users: [] as User[] };
+	let lastMessageVersion = -1
+	let lastUserVersion = -1
+	let last = { messages: [] as Message[], users: [] as User[] };
 
-	let last: { messages: Message[]; users: User[] };
+	// let last: { messages: Message[]; users: User[] };
 
 	try {
 		while (true) {
@@ -38,21 +38,21 @@ export const getChat = query.live(chatArgs, async function* ({ room, id, usernam
 			const msgState = await chatRoom.getState();
 			const userState = await userList.getUsers();
 
-			//   if (msgState.version !== lastMessageVersion || userState.version !== lastUserVersion) {
-			//     lastMessageVersion = msgState.version
-			//     lastUserVersion = userState.version
-			//     last = { messages: msgState.messages, users: userState.users }
-			//     yield last
-			//   }
+			  if (msgState.version !== lastMessageVersion || userState.version !== lastUserVersion) {
+			    lastMessageVersion = msgState.version
+			    lastUserVersion = userState.version
+			    last = { messages: msgState.messages, users: userState.users }
+			    yield last
+			  }
 
-			if (msgState.isChanged || userState.isChanged) {
-				last = { messages: msgState.messages, users: userState.users };
-				chatRoom.acknowledgeChange();
-				userList.acknowledgeChange();
-				yield last;
-			}
+			// if (msgState.isChanged || userState.isChanged) {
+			// 	last = { messages: msgState.messages, users: userState.users };
+			// 	chatRoom.acknowledgeChange();
+			// 	userList.acknowledgeChange();
+			// 	yield last;
+			// }
 
-			await new Promise((r) => setTimeout(r, 2000));
+			// await new Promise((r) => setTimeout(r, 1000));
 		}
 	} finally {
 		await chatRoom.leave(id);

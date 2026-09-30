@@ -4,13 +4,14 @@ import { DurableObject } from 'cloudflare:workers';
 export class ChatRoom extends DurableObject {
 	messages: Message[] = [];
 	maxMessages = 200;
-	// version = 0
-	isChanged = false;
+	maxVersion = 500
+	version = 0
+	// isChanged = false;
 	usersPresent = new Set<string>();
 
-	acknowledgeChange() {
-		this.isChanged = false;
-	}
+	// acknowledgeChange() {
+	// 	this.isChanged = false;
+	// }
 
 	join(id: string) {
 		const isNew = !this.usersPresent.has(id);
@@ -27,8 +28,8 @@ export class ChatRoom extends DurableObject {
 		if (this.messages.length > this.maxMessages) {
 			this.messages.shift();
 		}
-		// this.version++
-		this.isChanged = true;
+		this.version = (this.version % this.maxVersion) + 1
+		// this.isChanged = true;
 	}
 
 	deleteMessage(id: string) {
@@ -37,7 +38,8 @@ export class ChatRoom extends DurableObject {
 		if (index !== -1) {
 			this.messages.splice(index, 1);
 			// this.version++
-			this.isChanged = true;
+			this.version = (this.version % this.maxVersion) + 1
+			// this.isChanged = true;
 		}
 	}
 
@@ -47,12 +49,14 @@ export class ChatRoom extends DurableObject {
 		if (index !== -1) {
 			this.messages[index].text = text;
 			console.log(this.messages[index]);
-			this.isChanged = true;
+			// this.isChanged = true;
+			// this.version++
+			this.version = (this.version % this.maxVersion) + 1
 		}
 	}
 
 	getState() {
-		// return { version: this.version, messages: this.messages }
-		return { isChanged: this.isChanged, messages: this.messages }; // fixed type
+		return { version: this.version, messages: this.messages }
+		// return { isChanged: this.isChanged, messages: this.messages }; // fixed type
 	}
 }
