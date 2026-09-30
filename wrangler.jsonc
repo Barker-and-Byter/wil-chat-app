@@ -1,28 +1,28 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "chat-app",
-  "compatibility_date": "2026-09-26",
-  "main": ".svelte-kit/cloudflare/_worker.js",
-  "assets": {
-    "binding": "ASSETS",
-    "directory": ".svelte-kit/cloudflare"
-  },
-  "workers_dev": true,
-  "preview_urls": true,
-  "observability": {
-    "enabled": true
-  },
-   "durable_objects": {
-    "bindings": [
-      { "name": "CHAT_ROOM", "class_name": "ChatRoom" },
-      { "name": "USER_LIST", "class_name": "UserList" },
-      { "name": "ROOM_LIST", "class_name": "RoomList" }
-    ]
-  },
-  "migrations": [
-    {
-      "tag": "v1",
-      "new_sqlite_classes": ["ChatRoom", "UserList", "RoomList"]
-    }
-  ]
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "chat-app",
+	"compatibility_date": "2026-09-26",
+	"main": ".svelte-kit/cloudflare/_worker.js",
+	"assets": {
+		"binding": "ASSETS",
+		"directory": ".svelte-kit/cloudflare"
+	},
+	"workers_dev": true,
+	"preview_urls": true,
+	"observability": {
+		"enabled": true
+	},
+	"durable_objects": {
+		"bindings": [
+			{ "name": "CHAT_ROOM", "class_name": "ChatRoom" },
+			{ "name": "USER_LIST", "class_name": "UserList" },
+			{ "name": "ROOM_LIST", "class_name": "RoomList" }
+		]
+	},
+	"migrations": [
+		{
+			"tag": "v1",
+			"new_sqlite_classes": ["ChatRoom", "UserList", "RoomList"]
+		}
+	]
 }

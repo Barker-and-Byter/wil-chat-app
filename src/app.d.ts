@@ -9,9 +9,9 @@ declare global {
 			session?: Session;
 
 			env: {
-				ROOM: DurableObjectNamespace
-				USER_LIST: DurableObjectNamespace
-			}
+				ROOM: DurableObjectNamespace;
+				USER_LIST: DurableObjectNamespace;
+			};
 		}
 
 		// interface Error {}
@@ -19,7 +19,7 @@ declare global {
 		// interface PageState {}
 
 		interface Platform {
-			env: ENV
+			env: ENV;
 		}
 		// interface Platform {
 		// 	env: {
@@ -30,7 +30,6 @@ declare global {
 		// 	};
 		// 	caches: CacheStorage & { default: Cache }
 		// }
-
 	}
 }
 
