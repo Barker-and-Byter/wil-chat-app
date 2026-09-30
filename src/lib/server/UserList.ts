@@ -1,4 +1,4 @@
-import { error } from '@sveltejs/kit';
+
 import { DurableObject } from 'cloudflare:workers';
 import type { User } from '$lib/types/types';
 
