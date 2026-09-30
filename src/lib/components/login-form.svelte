@@ -4,12 +4,11 @@
 	import {
 		FieldGroup,
 		Field,
-		FieldLabel,
-		FieldDescription
+		FieldLabel
 	} from '$lib/components/ui/field/index.js';
 	import { Input } from '$lib/components/ui/input/index.js';
 
-	let { onLogin }: { OnLogin: (username: string) => void } = $props();
+	let { onLogin }: { onLogin: (username: string) => void } = $props();
 
 	const id = $props.id();
 
