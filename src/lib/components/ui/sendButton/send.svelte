@@ -8,4 +8,4 @@
 <Button variant="outline" size="icon" {onclick} {...restProps}>
 	<Send />
 </Button>
-z
+
