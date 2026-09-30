@@ -37,9 +37,10 @@
 						placeholder="Username"
 						required
 						bind:value={username}
-						maxlength="20"
-						minlength="3"
+						maxlength = {20}
+						minlength = {3}
 					/>
+
 				</Field>
 				<Field>
 					<Button type="submit" class="w-full">Login</Button>
