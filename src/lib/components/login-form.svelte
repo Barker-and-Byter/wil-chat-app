@@ -50,9 +50,10 @@
 						placeholder="Username"
 						required
 						bind:value={username}
-						maxlength="20"
-						minlength="3"
+						maxlength = {20}
+						minlength = {3}
 					/>
+
 				</Field>
 				{#if errorMessage}
 					<p class="text-sm font-semibold text-destructive mt-1">
