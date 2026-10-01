@@ -25,7 +25,16 @@ const typingSchema = type({ userId: 'string', typing: 'boolean' });
 
 // resolver
 // let currentResolver = Promise.withResolvers<void>()
-const chatListeners: (() => void)[] = [];
+// const chatListeners: (() => void)[] = [];
+const chatListeners = new Set<() => void>();
+
+
+// Interval runner
+setInterval(() => {
+    for (const room of rooms) {
+        disconnectUsers(room);
+    }
+}, 5000);
 
 // helpers 
 
@@ -47,8 +56,14 @@ function notify() {
     // currentResolver.resolve()
     // currentResolver = Promise.withResolvers<void>()
 
-    chatListeners.forEach(resolve => resolve());
-    chatListeners.length = 0;
+    // chatListeners.forEach(resolve => resolve());
+    // chatListeners.length = 0;
+
+    for (const resolve of chatListeners) {
+        resolve();
+    }
+
+    chatListeners.clear();
 }
 
 function pushMessage(room: Room, user: User, text: string, system = false) {
@@ -70,10 +85,20 @@ function getTypingUsers(room: Room) {
         .map(u => ({ id: u.id, username: u.username }))
 }
 
-// function disconnectUsers() {
-//     const cutoff = new Date(Date.now() - 7000)
-//     const disconnected = users.filter()
-// }
+function disconnectUsers(room: Room) {
+    const cutoff = new Date(Date.now() - 10000)
+    const disconnectedUsers = users.filter(u => u.lastSeen < cutoff && room.joinedIds.includes(u.id))
+
+    for (const user of disconnectedUsers) {
+        const userListIndex = users.findIndex(u => u.id === user.id)
+        if (userListIndex !== -1) users.splice(userListIndex, 1)
+
+        const userJoinedIndex = room.joinedIds.indexOf(user.id)
+        if (userJoinedIndex !== -1) room.joinedIds.splice(userJoinedIndex, 1)
+
+        pushMessage(room, user, `${user.username} left the chat`, true)
+    }
+}
 
 // Chat
 
@@ -93,7 +118,7 @@ export const getChat = query.live(chatSchema, async function* ({ roomId, userId 
     }
 
 
-    try {
+    // try {
         while (true) {
             // const change = currentResolver.promise
 
@@ -101,28 +126,40 @@ export const getChat = query.live(chatSchema, async function* ({ roomId, userId 
 
             // then filter users
 
+            thisUser.lastSeen = new Date()
+
 
             // might be better to have two functions, one yielding typing, one messages?
             yield {...thisRoom, messages: getMessages(roomId), typing: getTypingUsers(thisRoom) }
             // await Promise.race([change, new Promise(resolve => setTimeout(resolve, 5000))])
             // await change
 
-            const { promise, resolve } = Promise.withResolvers<void>();
-            chatListeners.push(resolve);
+            const { promise, resolve } = Promise.withResolvers<void>()
+            // const { promise, resolve } = Promise.withResolvers<void>();
+            // chatListeners.push(resolve);
+            chatListeners.add(resolve)
 
             // Race the local listener promise against your 5-second fallback timeout
-            await Promise.race([ promise, new Promise(r => setTimeout(r, 5000))]);
+            // await Promise.race([ promise, new Promise(r => setTimeout(r, 5000))]);
+            // await promise
+
+            await Promise.race([ promise, new Promise<void>((resolve) => setTimeout(resolve, 5000) ) ]);
+
+            chatListeners.delete(resolve);
         }
 
-    } finally {
-        const userListIndex = users.findIndex(user => user.id === userId)
-        if (userListIndex !== -1) users.splice(userListIndex, 1)
+    // } catch {
+    //     pushMessage(thisRoom, thisUser, `${thisUser.username} left the chat`, true)
+    // }
+    // finally {
+    //     const userListIndex = users.findIndex(user => user.id === userId)
+    //     if (userListIndex !== -1) users.splice(userListIndex, 1)
 
-        const userJoinedIndex = thisRoom.joinedIds.indexOf(userId)
-        if (userJoinedIndex !== -1) thisRoom.joinedIds.splice(userJoinedIndex, 1)
+    //     const userJoinedIndex = thisRoom.joinedIds.indexOf(userId)
+    //     if (userJoinedIndex !== -1) thisRoom.joinedIds.splice(userJoinedIndex, 1)
 
-        pushMessage(thisRoom, thisUser, `${thisUser.username} left the chat`, true)
-    }
+    //     pushMessage(thisRoom, thisUser, `${thisUser.username} left the chat`, true)
+    // }
 });
 
 export const addMessage = command(messageSchema, async ({ roomId, userId, text }) => {
