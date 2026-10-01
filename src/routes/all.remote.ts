@@ -42,14 +42,16 @@ export const getChat = query.live(chatSchema, async function* ({ userId }) {
 });
 
 export const addMessage = command(messageSchema, async ({ userId, text }) => {
-    if (text.length > 50) error(400, 'Message length exceeds limit');
+    if (text.length > 255) error(400, 'Message length exceeds limit');
     if (text.length < 1) error(400, 'Please type a message');
 
-    const validPattern = /^[a-zA-Z0-9_\-\p{Extended_Pictographic}]+$/u;
+    // do patch for symbols
 
-    if (!validPattern.test(text)) {
-        error(400, 'Username can only contain letters, numbers, underscores, hyphens, or emojis');
-    }
+    // const validPattern = /^[a-zA-Z0-9_\-\p{Extended_Pictographic}]+$/u;
+
+    // if (!validPattern.test(text)) {
+    //     error(400, 'Username can only contain letters, numbers, underscores, hyphens, or emojis');
+    // }
 
     const problem = await getChatStub().addMessage(userId, text);
     if (problem) error(400, problem);
@@ -62,13 +64,13 @@ export const addUser = command(userSchema, async ({ userId, username }) => {
     username = username.trim();
 
     if (!username || username.length === 0) error(409, 'Username is required!');
-    if (username.length > 20) error(409, 'Username exceeds acceptable bounds');
+    if (username.length > 255) error(409, 'Username exceeds acceptable bounds');
     if (username.length < 3) error(409, 'Username must be 3 characters long');
 
-    const validPattern = /^[a-zA-Z0-9_-]+$/;
-    if (!validPattern.test(username)) {
-        error(400, 'Username can only contain letters, numbers, underscores, or hyphens');
-    }
+    // const validPattern = /^[a-zA-Z0-9_-]+$/;
+    // if (!validPattern.test(username)) {
+    //     error(400, 'Username can only contain letters, numbers, underscores, or hyphens');
+    // }
 
     const problem = await getChatStub().addUser(userId, username);
     if (problem) error(409, problem);
