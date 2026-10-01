@@ -1,23 +1,20 @@
 import { type } from 'arktype';
 import { error } from '@sveltejs/kit';
 import { query, command } from '$app/server';
-import type { Message, User, Room } from '$lib/types/types';
+import type { Message, User } from '$lib/types/types';
 
 
 // In Memory 
 const users: User[] = []
-const rooms: Room[] = [{ id: 'main', name: 'main', createdAt: new Date(), joinedIds: [] }]
 const messages: Message[] = []
 
-
 // chat
-const chatSchema = type({ roomId: 'string', userId: 'string' });
-const messageSchema = type({ roomId: 'string', userId: 'string', text: 'string' });
-const deleteSchema = type({ roomId: 'string', messageId: 'string' });
-const editSchema = type({ roomId: 'string', messageId: 'string', text: 'string' });
+const chatSchema = type({ userId: 'string' });
+const messageSchema = type({ userId: 'string', text: 'string' });
+const deleteSchema = type({ messageId: 'string' });
+const editSchema = type({ messageId: 'string', text: 'string' });
 
 // rooms
-const createRoomSchema = type({ name: 'string' });
 
 // users
 const userSchema = type({ userId: 'string', username: 'string' });
@@ -29,21 +26,15 @@ const chatListeners = new Set<() => void>();
 
 // Interval runner
 setInterval(() => {
-    for (const room of rooms) {
-        disconnectUsers(room);
-    }
+
+        disconnectUsers();
+
 }, 5000);
 
 // helpers 
 
-function getRoom(roomId: string) {
-    const thisRoom = rooms.find(r => r.id === roomId)
-    if (!thisRoom) error(404, 'room does not exist')
-    return thisRoom
-}
-
-function getMessages(roomId: string) {
-    return messages.filter(m => m.roomId === roomId)
+function getMessages() {
+    return messages
 }
 
 function getUser(userId: string) {
@@ -58,10 +49,9 @@ function notify() {
     chatListeners.clear();
 }
 
-function pushMessage(room: Room, user: User, text: string, system = false) {
+function pushMessage(user: User, text: string, system = false) {
     messages.push({
         messageId: crypto.randomUUID(),
-        roomId: room.id,
         userId: user.id,
         username: user.username,
         text: text,
@@ -70,7 +60,7 @@ function pushMessage(room: Room, user: User, text: string, system = false) {
     notify()
 }
 
-function getTypingUsers(room: Room) {
+function getTypingUsers() {
     const cutoff = new Date(Date.now() - 7000)
     return users
         .filter(u => u.typing && u.lastSeen > cutoff && room.joinedIds.includes(u.id))
@@ -133,10 +123,12 @@ export const addMessage = command(messageSchema, async ({ roomId, userId, text }
     if (!thisUser) error(400, 'You need to join before sending messages');
     if (text.length > 50) error(400, 'Message length exceeds limit');
     if (text.length < 1) error(400, "Please type a message");
+
     const validPattern = /^[a-zA-Z0-9_\-\p{Extended_Pictographic}]+$/u;
+
     if (!validPattern.test(text)) {
-    error(400, 'Username can only contain letters, numbers, underscores, hyphens, or emojis');
-}
+        error(400, 'Username can only contain letters, numbers, underscores, hyphens, or emojis');
+    }
 
 
     pushMessage(thisRoom, thisUser, text)
@@ -167,19 +159,6 @@ export const editMessage = command(editSchema, async ({ roomId, messageId, text 
 
 // ROOMS
 
-
-// Should be a query.live
-export const getRooms = query(async () => {
-    return { rooms }
-});
-
-export const createRoom = command(createRoomSchema, async ({ name }) => {
-    const taken = rooms.some((r: Room) => r.name === name)
- 
-    if (taken) error(409, 'Room already exists')
- 
-    rooms.push({ id: crypto.randomUUID(), name: name, createdAt: new Date(), joinedIds: [] })
-});
 
 
 // USERS
