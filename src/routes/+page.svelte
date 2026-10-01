@@ -253,5 +253,7 @@
 	</footer>
 	{#if errorMessage}
 		<p class="text-sm font-semibold text-destructive mt-1">
+			{errorMessage}
+		</p>
 	{/if}
 </main>
