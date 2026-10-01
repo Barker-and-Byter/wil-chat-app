@@ -11,18 +11,5 @@
 	"preview_urls": true,
 	"observability": {
 		"enabled": true
-	},
-	// "durable_objects": {
-	// 	"bindings": [
-	// 		{ "name": "CHAT_ROOM", "class_name": "ChatRoom" },
-	// 		{ "name": "USER_LIST", "class_name": "UserList" },
-	// 		{ "name": "ROOM_LIST", "class_name": "RoomList" }
-	// 	]
-	// },
-	// "migrations": [
-	// 	{
-	// 		"tag": "v1",
-	// 		"new_sqlite_classes": ["ChatRoom", "UserList", "RoomList"]
-	// 	}
-	// ]
+	}
 }
