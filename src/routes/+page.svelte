@@ -22,7 +22,7 @@
 
     const roomId = 'main';
 	
-	let errorMessage = $inspectstate('');
+	let errorMessage = $state('');
     let inputField = $state('');
 	let chatHistory: HTMLDivElement | null = $state(null);
 
@@ -102,7 +102,7 @@
 		inputField = ''
 		try{
 
-        await addMessage({ roomId: roomId, userId: id, text: thisInput });
+        	await addMessage({ roomId: roomId, userId: id, text: thisInput });
 
 		} catch (err : any) {
 			if (err.status === 400){
