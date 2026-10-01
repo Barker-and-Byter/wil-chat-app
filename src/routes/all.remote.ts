@@ -11,8 +11,6 @@ const messages: Message[] = []
 // chat
 const chatSchema = type({ userId: 'string' });
 const messageSchema = type({ userId: 'string', text: 'string' });
-const deleteSchema = type({ messageId: 'string' });
-const editSchema = type({ messageId: 'string', text: 'string' });
 
 // rooms
 
@@ -63,48 +61,40 @@ function pushMessage(user: User, text: string, system = false) {
 function getTypingUsers() {
     const cutoff = new Date(Date.now() - 7000)
     return users
-        .filter(u => u.typing && u.lastSeen > cutoff && room.joinedIds.includes(u.id))
+        .filter(u => u.typing && u.lastSeen > cutoff)
         .map(u => ({ id: u.id, username: u.username }))
 }
 
-function disconnectUsers(room: Room) {
+function disconnectUsers() {
     const cutoff = new Date(Date.now() - 10000)
-    const disconnectedUsers = users.filter(u => u.lastSeen < cutoff && room.joinedIds.includes(u.id))
+    const disconnectedUsers = users.filter(u => u.lastSeen < cutoff )
 
     for (const user of disconnectedUsers) {
         const userListIndex = users.findIndex(u => u.id === user.id)
         if (userListIndex !== -1) users.splice(userListIndex, 1)
 
-        const userJoinedIndex = room.joinedIds.indexOf(user.id)
-        if (userJoinedIndex !== -1) room.joinedIds.splice(userJoinedIndex, 1)
-
-        pushMessage(room, user, `${user.username} left the chat`, true)
+        pushMessage(user, `${user.username} left the chat`, true)
     }
 }
 
 // Chat
 
-export const getChat = query.live(chatSchema, async function* ({ roomId, userId }) {
-
-    const thisRoom = getRoom(roomId)
+export const getChat = query.live(chatSchema, async function* ({ userId }) {
 
     const thisUser = users.find(user => user.id === userId)
 
     if (!thisUser) error(404, 'must join before you can message')
 
-    const alreadyJoined = thisRoom?.joinedIds.includes(userId)
 
-    if (!alreadyJoined) {
-        thisRoom.joinedIds.push(userId)
-        pushMessage(thisRoom, thisUser, `${thisUser.username} joined the chat`, true)
-    }
+    pushMessage( thisUser, `${thisUser.username} joined the chat`, true)
+
 
 
     // try {
         while (true) {
             thisUser.lastSeen = new Date()
 
-            yield {...thisRoom, messages: getMessages(roomId), typing: getTypingUsers(thisRoom) }
+            yield { messages: getMessages(), typing: getTypingUsers() }
 
             const { promise, resolve } = Promise.withResolvers<void>()
 
@@ -116,8 +106,8 @@ export const getChat = query.live(chatSchema, async function* ({ roomId, userId 
         }
 });
 
-export const addMessage = command(messageSchema, async ({ roomId, userId, text }) => {
-    const thisRoom = getRoom(roomId)
+export const addMessage = command(messageSchema, async ({ userId, text }) => {
+
     const thisUser = getUser(userId)
 
     if (!thisUser) error(400, 'You need to join before sending messages');
@@ -131,39 +121,17 @@ export const addMessage = command(messageSchema, async ({ roomId, userId, text }
     }
 
 
-    pushMessage(thisRoom, thisUser, text)
+    pushMessage( thisUser, text)
 
     if (messages.length > 200) messages.shift()
 })
-
-// Need to add some validation
-export const deleteMessage = command(deleteSchema, async ({ roomId, messageId }) => {
-    const messageIndex = messages.findIndex(m => m.messageId === messageId && m.roomId === roomId)
- 
-    if (messageIndex === -1) error(404, 'message does not exist')
- 
-    messages.splice(messageIndex, 1)
-    notify()
-});
-
-// need to add some validation, non users can't change id
-export const editMessage = command(editSchema, async ({ roomId, messageId, text }) => {
-     const message = messages.find(m => m.messageId === messageId && m.roomId === roomId)
- 
-    if (!message) error(404, 'message does not exist')
- 
-    message.text = text
-    notify()
-});
-
-
-// ROOMS
-
 
 
 // USERS
 
 export const addUser = command(userSchema, async ({ userId, username }) => {
+    if (users.length > 200) return
+
     const taken = users.some((u: User) => u.username.toLowerCase() === username.toLowerCase() && u.id !== userId)
 
     username = username.trim();
