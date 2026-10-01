@@ -95,14 +95,30 @@ export class Chat extends DurableObject {
         return { messages: this.messages, typing: this.getTypingUsers() };
     }
 
-    addMessage(userId: string, text: string) {
+    async addMessage(userId: string, text: string) {
         const user = this.users.find((u) => u.id === userId);
         if (!user) return 'You need to join before sending messages';
 
         this.pushMessage(user, text);
         if (this.messages.length > 200) this.messages.shift();
 
+        await this.scheduleCleanup();
         return null;
+    }
+
+    async scheduleCleanup() {
+        const existing = await this.ctx.storage.getAlarm();
+        if (existing === null) {
+            await this.ctx.storage.setAlarm(Date.now() + 10000);
+        }
+    }
+
+    async alarm() {
+        this.disconnectUsers();
+
+        if (this.users.length > 0) {
+            await this.ctx.storage.setAlarm(Date.now() + 10000);
+        }
     }
 
     setTyping(userId: string, typing: boolean) {
