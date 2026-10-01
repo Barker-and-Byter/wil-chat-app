@@ -16,14 +16,14 @@
 
 	let errorMessage = $state('');
 
-	function handleLogin(event: SubmitEvent) {
+	async function handleLogin(event: SubmitEvent) {
 		event.preventDefault();
 		
 		errorMessage = '';
 
 		if (username.trim()) {
 			try {
-				onLogin(username.trim());
+				await onLogin(username.trim());
 			} catch (err : any) {
 				if (err.status === 409){
 					errorMessage = err.body?.message || 'Username taken';
