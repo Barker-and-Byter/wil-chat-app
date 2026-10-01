@@ -104,6 +104,7 @@
 
         	await addMessage({ roomId: roomId, userId: id, text: thisInput });
 
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (err : any) {
 			if (err.status === 400){
 				errorMessage = err.body?.message || "an expected error occured";
