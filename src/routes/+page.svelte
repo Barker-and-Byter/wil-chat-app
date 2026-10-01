@@ -234,6 +234,8 @@
             oninput={handleTyping}
 			onkeydown={(e) => { if (e.key === "Enter") handleSend() }} 
 			class="max-w-300"
+			maxlength="50"
+			minlength="1"
 		/>
 		<SendButton onclick={handleSend} />
 	</footer>
