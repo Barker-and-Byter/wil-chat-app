@@ -24,6 +24,7 @@
 		if (username.trim()) {
 			try {
 				await onLogin(username.trim());
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			} catch (err : any) {
 				if (err.status === 409){
 					errorMessage = err.body?.message || 'Username error';
