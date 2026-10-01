@@ -7,11 +7,6 @@ declare global {
 		interface Locals {
 			user?: User;
 			session?: Session;
-
-			env: {
-				ROOM: DurableObjectNamespace;
-				USER_LIST: DurableObjectNamespace;
-			};
 		}
 
 		// interface Error {}
@@ -19,17 +14,11 @@ declare global {
 		// interface PageState {}
 
 		interface Platform {
-			env: ENV;
+			env: {
+                CHAT: DurableObjectNamespace;
+            };
 		}
-		// interface Platform {
-		// 	env: {
-		// 		COUNTER: DurableObjectNamespace;
-		// 	};
-		// 	context: {
-		// 		waitUntil(promise: Promise<any>): void;
-		// 	};
-		// 	caches: CacheStorage & { default: Cache }
-		// }
+
 	}
 }
 
