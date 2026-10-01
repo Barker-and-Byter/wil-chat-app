@@ -22,7 +22,7 @@
 
     const roomId = 'main';
 	
-	let errorMessage = state('');
+	let errorMessage = $inspectstate('');
     let inputField = $state('');
 	let chatHistory: HTMLDivElement | null = $state(null);
 
@@ -104,7 +104,7 @@
 
         await addMessage({ roomId: roomId, userId: id, text: thisInput });
 
-		} except (err : any) {
+		} catch (err : any) {
 			if (err.status === 400){
 				errorMessage = err.body?.message || "an expected error occured";
 			} else {
@@ -246,8 +246,8 @@
             oninput={handleTyping}
 			onkeydown={(e) => { if (e.key === "Enter") handleSend() }} 
 			class="max-w-300"
-			maxlength="50"
-			minlength="1"
+			maxlength={50}
+			minlength={1}
 		/>
 		<SendButton onclick={handleSend} />
 	</footer>
