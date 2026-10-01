@@ -131,6 +131,13 @@ export const addMessage = command(messageSchema, async ({ roomId, userId, text }
     const thisUser = getUser(userId)
 
     if (!thisUser) error(400, 'You need to join before sending messages');
+    if (text.length > 50) error(400, 'Message length exceeds limit');
+    if (text.length < 1) error(400, "Please type a message");
+    const validPattern = /^[a-zA-Z0-9_\-\p{Extended_Pictographic}]+$/u;
+    if (!validPattern.test(text)) {
+    error(400, 'Username can only contain letters, numbers, underscores, hyphens, or emojis');
+}
+
 
     pushMessage(thisRoom, thisUser, text)
 
@@ -178,9 +185,19 @@ export const createRoom = command(createRoomSchema, async ({ name }) => {
 // USERS
 
 export const addUser = command(userSchema, async ({ userId, username }) => {
-     const taken = users.some((u: User) => u.username === username && u.id !== userId)
- 
-    if (taken) error(409, 'Username taken')
+    const taken = users.some((u: User) => u.username.toLowerCase() === username.toLowerCase() && u.id !== userId)
+
+    username = username.trim();
+
+    if (!username || username.length === 0) error(409, "Username is required!");
+    if (taken) error(409, 'Username taken');
+    if (username.length > 20) error (409, 'Username exceeds acceptable bounds');
+    if (username.length < 3) error (409, 'Username must be 3 characters long');
+    const validPattern = /^[a-zA-Z0-9_-]+$/;
+    if (!validPattern.test(username)) {
+        error(400, 'Username can only contain letters, numbers, underscores, or hyphens');
+
+}
  
     const existingUser = users.find(u => u.id === userId)
  

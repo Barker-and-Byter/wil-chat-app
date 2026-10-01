@@ -21,7 +21,8 @@
     import type { User } from '$lib/types/types';
 
     const roomId = 'main';
-
+	
+	let errorMessage = state('');
     let inputField = $state('');
 	let chatHistory: HTMLDivElement | null = $state(null);
 
@@ -94,11 +95,22 @@
 
 	async function handleSend() {
         const thisInput = inputField.trim()
+		errorMessage = '';
 
 		if (thisInput === '') return;
 
 		inputField = ''
-        await addMessage({ roomId: roomId, userId: id, text: thisInput })
+		try{
+
+        await addMessage({ roomId: roomId, userId: id, text: thisInput });
+
+		} except (err : any) {
+			if (err.status === 400){
+				errorMessage = err.body?.message || "an expected error occured";
+			} else {
+				errorMessage = "an unexpected error occured";
+			}
+		}
 	}
 
 	onMount(() => {
@@ -234,7 +246,12 @@
             oninput={handleTyping}
 			onkeydown={(e) => { if (e.key === "Enter") handleSend() }} 
 			class="max-w-300"
+			maxlength="50"
+			minlength="1"
 		/>
 		<SendButton onclick={handleSend} />
 	</footer>
+	{#if errorMessage}
+		<p class="text-sm font-semibold text-destructive mt-1">
+	{/if}
 </main>

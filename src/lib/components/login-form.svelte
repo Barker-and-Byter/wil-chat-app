@@ -26,7 +26,7 @@
 				await onLogin(username.trim());
 			} catch (err : any) {
 				if (err.status === 409){
-					errorMessage = err.body?.message || 'Username taken';
+					errorMessage = err.body?.message || 'Username error';
 				} else {
 					errorMessage = 'An unexpected error occured'
 				}
