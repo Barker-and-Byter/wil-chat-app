@@ -64,10 +64,16 @@ function pushMessage(room: Room, user: User, text: string, system = false) {
 }
 
 function getTypingUsers(room: Room) {
+    const cutoff = new Date(Date.now() - 7000)
     return users
-        .filter(u => u.typing && room.joinedIds.includes(u.id))
+        .filter(u => u.typing && u.lastSeen > cutoff && room.joinedIds.includes(u.id))
         .map(u => ({ id: u.id, username: u.username }))
 }
+
+// function disconnectUsers() {
+//     const cutoff = new Date(Date.now() - 7000)
+//     const disconnected = users.filter()
+// }
 
 // Chat
 
@@ -91,6 +97,9 @@ export const getChat = query.live(chatSchema, async function* ({ roomId, userId 
         while (true) {
             // const change = currentResolver.promise
 
+            // set user date
+
+            // then filter users
 
 
             // might be better to have two functions, one yielding typing, one messages?
@@ -102,10 +111,7 @@ export const getChat = query.live(chatSchema, async function* ({ roomId, userId 
             chatListeners.push(resolve);
 
             // Race the local listener promise against your 5-second fallback timeout
-            await Promise.race([
-                promise, 
-                new Promise(r => setTimeout(r, 5000))
-            ]);
+            await Promise.race([ promise, new Promise(r => setTimeout(r, 5000))]);
         }
 
     } finally {
@@ -120,9 +126,7 @@ export const getChat = query.live(chatSchema, async function* ({ roomId, userId 
 });
 
 export const addMessage = command(messageSchema, async ({ roomId, userId, text }) => {
-
     const thisRoom = getRoom(roomId)
-
     const thisUser = getUser(userId)
 
     if (!thisUser) error(400, 'You need to join before sending messages');
