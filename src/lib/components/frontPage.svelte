@@ -35,11 +35,13 @@
 	let messages = $derived(loadChat?.current?.messages ?? []);
 	let users = $derived(loadChat?.current?.users ?? []);
 
+
 	async function completeLogin(submittedUsername: string) {
 		username = submittedUsername;
 		isLoggedIn = true;
         addUser({ id: id, username: username }); // Same with this
 		loadChat = getChat({ room: 'global', id: id, username: username });
+
 	}
 
 	async function handleSend() {
