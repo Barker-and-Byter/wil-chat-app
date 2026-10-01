@@ -15,7 +15,10 @@ declare global {
 
 		interface Platform {
 			env: {
-                CHAT: DurableObjectNamespace;
+                CHAT: {
+                    idFromName(name: string): DurableObjectId;
+                    get(id: DurableObjectId): ChatStub;
+                };
             };
 		}
 
