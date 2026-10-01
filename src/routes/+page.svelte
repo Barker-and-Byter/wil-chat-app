@@ -1,5 +1,4 @@
 <script lang="ts">
-    import { Button } from '$lib/components/ui/button/index.js';
 	import ModeToggle from '$lib/components/ui/modeToggle/modeToggle.svelte';
 	import SendButton from '$lib/components/ui/sendButton/send.svelte';
 	import ScrollArea from '$lib/components/ui/scroll-area/scroll-area.svelte';
@@ -13,21 +12,16 @@
 	import { Marker, MarkerContent } from '$lib/components/ui/marker';
 	import LoginForm from '$lib/components/login-form.svelte';
 
-	import { getChat, addMessage, deleteMessage, editMessage, addUser, setTyping } from './all.remote'
+	import { getChat, addMessage, addUser, setTyping } from './all.remote'
 	import { onMount, tick } from 'svelte';
 
-	import { PencilIcon, TrashIcon, EllipsisVertical } from '@lucide/svelte';
-	import { DropdownMenu } from 'bits-ui';
     import type { User } from '$lib/types/types';
-
-    const roomId = 'main';
 	
 	let errorMessage = $state('');
     let inputField = $state('');
 	let chatHistory: HTMLDivElement | null = $state(null);
 
-	let editMessageId = $state('');
-	let editInput = $state('');
+
 
 	let isLoggedIn = $state(false);
 	let id = $state('');
@@ -90,7 +84,7 @@
 		username = submittedUsername;
         await addUser({ userId: id, username: username })
 		isLoggedIn = true;
-		loadChat = getChat({ roomId: roomId, userId: id });
+		loadChat = getChat({ userId: id });
 	}
 
 	async function handleSend() {
@@ -102,14 +96,14 @@
 		inputField = ''
 		try{
 
-        	await addMessage({ roomId: roomId, userId: id, text: thisInput });
+        	await addMessage({ userId: id, text: thisInput });
 
 		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		} catch (err : any) {
 			if (err.status === 400){
-				errorMessage = err.body?.message || "an expected error occured";
+				errorMessage = err.body?.message || "an expected error occurred";
 			} else {
-				errorMessage = "an unexpected error occured";
+				errorMessage = "an unexpected error occurred";
 			}
 		}
 	}
@@ -118,20 +112,6 @@
 		id = crypto.randomUUID();
 	});
 
-	async function editApply() {
-		await editMessage({ roomId: roomId, messageId: editMessageId, text: editInput })
-        editMessageId = '';
-		editInput = '';
-	}
-
-    function cancelEdit() {
-		editMessageId = '';
-		editInput = '';
-	}
-
-	async function delMsg(messageId: string) {
-		await deleteMessage({ roomId: roomId, messageId: messageId })
-	}
 </script>
 
 {#if !isLoggedIn}
@@ -161,61 +141,12 @@
 						<MessageContent class="relative max-w-[75%] hover:z-50 focus-within:z-50">
 							<div class="flex items-center gap-1 {msg.username === username ? 'justify-end' : 'justify-start'}">
 
-                                {#if msg.username === username }
-									<DropdownMenu.Root >
-										<DropdownMenu.Trigger>
-											{#snippet child({ props })}
-												<Button
-													{...props}
-													variant="ghost"
-													size="icon"
-													class="h-7 w-7 shrink-0 opacity-0 transition-opacity group-hover:opacity-100 focus-visible:opacity-100"
-												>
-													<EllipsisVertical class="h-4 w-4 text-muted-foreground" />
-												</Button>
-											{/snippet}
-										</DropdownMenu.Trigger>
- 
-										<DropdownMenu.Content align="end" onCloseAutoFocus={(e) => e.preventDefault()}>
-											<DropdownMenu.Item
-												onclick={() => {
-													editMessageId = msg.messageId;
-													editInput = msg.text;
-												}}
-                                                class="focus:bg-black/60 bg-gray-900/30 px-2 py-1 rounded-md flex flex-row gap-2 items-center cursor-default"
-											>
-												<PencilIcon size={14} />
-												Edit
-											</DropdownMenu.Item>
- 
-											<DropdownMenu.Item 
-                                                class="flex flex-row gap-2 px-2 py-1 bg-gray-900/30 rounded-md items-center text-destructive focus:bg-destructive/60 focus:text-white cursor-default z-10" 
-                                                onclick={() => delMsg(msg.messageId)}
-                                            >
-												<TrashIcon size={14} />
-												Delete
-											</DropdownMenu.Item>
-
-										</DropdownMenu.Content>
-									</DropdownMenu.Root>
-								{/if}
 
 								<Bubble class={msg.userId === id ? 'rounded-br-sm' : 'rounded-bl-sm'}>
 									<BubbleContent class="px-4 py-2.5 text-sm leading-relaxed">
-										{#if msg.messageId == editMessageId}
-											<input
-												class="w-full text-sm min-w-0 bg-transparent outline-none rounded-md"
-												bind:value={editInput}
-												onkeydown={(e) => {
-													if (e.key === 'Enter') editApply();
-													if (e.key === 'Escape') cancelEdit();
-												}}
-												onblur={cancelEdit}
 
-											/>
-										{:else}
 											{msg.text}
-										{/if}
+
 									</BubbleContent>
 								</Bubble>
  
