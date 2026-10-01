@@ -14,10 +14,23 @@
 
 	let username = $state('');
 
+	let errorMessage = $state('');
+
 	function handleLogin(event: SubmitEvent) {
 		event.preventDefault();
+		
+		errorMessage = '';
+
 		if (username.trim()) {
-			onLogin(username.trim());
+			try {
+				onLogin(username.trim());
+			} catch (err : any) {
+				if (err.status === 409){
+					errorMessage = err.body?.message || 'Username taken';
+				} else {
+					errorMessage = 'An unexpected error occured'
+				}
+			}
 		}
 	}
 </script>
@@ -42,6 +55,11 @@
 					/>
 
 				</Field>
+				{#if errorMessage}
+					<p class="text-sm font-semibold text-destructive mt-1">
+						{errorMessage}
+					</p>
+				{/if}
 				<Field>
 					<Button type="submit" class="w-full">Login</Button>
 				</Field>
