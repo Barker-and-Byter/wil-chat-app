@@ -29,7 +29,7 @@
 				if (err.status === 409){
 					errorMessage = err.body?.message || 'Username error';
 				} else {
-					errorMessage = 'An unexpected error occured'
+					errorMessage = 'An unexpected error occurred'
 				}
 			}
 		}
