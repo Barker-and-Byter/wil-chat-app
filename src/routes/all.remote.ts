@@ -110,6 +110,8 @@ export const addMessage = command(messageSchema, async ({ userId, text }) => {
 
     const thisUser = getUser(userId)
 
+    text = text.trim();
+
     if (!thisUser) error(400, 'You need to join before sending messages');
     if (text.length > 50) error(400, 'Message length exceeds limit');
     if (text.length < 1) error(400, "Please type a message");
