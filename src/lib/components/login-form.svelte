@@ -14,10 +14,24 @@
 
 	let username = $state('');
 
-	function handleLogin(event: SubmitEvent) {
+	let errorMessage = $state('');
+
+	async function handleLogin(event: SubmitEvent) {
 		event.preventDefault();
+		
+		errorMessage = '';
+
 		if (username.trim()) {
-			onLogin(username.trim());
+			try {
+				await onLogin(username.trim());
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			} catch (err : any) {
+				if (err.status === 409){
+					errorMessage = err.body?.message || 'Username error';
+				} else {
+					errorMessage = 'An unexpected error occurred'
+				}
+			}
 		}
 	}
 </script>
@@ -37,10 +51,16 @@
 						placeholder="Username"
 						required
 						bind:value={username}
-						maxlength="20"
-						minlength="3"
+						maxlength = {20}
+						minlength = {3}
 					/>
+
 				</Field>
+				{#if errorMessage}
+					<p class="text-sm font-semibold text-destructive mt-1">
+						{errorMessage}
+					</p>
+				{/if}
 				<Field>
 					<Button type="submit" class="w-full">Login</Button>
 				</Field>
