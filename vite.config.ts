@@ -2,7 +2,6 @@ import tailwindcss from '@tailwindcss/vite';
 import adapter from '@sveltejs/adapter-cloudflare';
 import { sveltekit } from '@sveltejs/kit/vite';
 import { defineConfig } from 'vite';
-// import cloudflareDoExporter from 'sveltekit-cloudflare-durable-objects';
 
 export default defineConfig({
 	plugins: [
